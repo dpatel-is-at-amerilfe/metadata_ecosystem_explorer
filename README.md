@@ -1,4 +1,7 @@
 # AmeriLife Metadata Graph — POC
+Deployed here: https://metadata-ecosystem-explorer-1054782505781628.8.azure.databricksapps.com
+
+--- 
 
 A polished, client-side **data-lineage graph explorer** built as a proof-of-concept.
 It renders AmeriLife metadata objects (source systems, staging/consolidated tables,
