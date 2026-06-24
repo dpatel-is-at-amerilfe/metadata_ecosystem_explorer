@@ -1,0 +1,1 @@
+command: ["sh", "-c", "npm run build && ./node_modules/.bin/vite preview --port $DATABRICKS_APP_PORT --host 0.0.0.0"]
