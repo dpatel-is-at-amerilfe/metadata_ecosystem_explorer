@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -17,7 +17,7 @@ import GraphNode from './GraphNode';
 import GraphEdge from './GraphEdge';
 import MiniGraphNode from './MiniGraphNode';
 import { CanvasToolbar } from './CanvasToolbar';
-import { mockNodes, mockEdges, miniNodes } from '../mockGraphData';
+import { mockNodes, mockEdges, miniNodes, miniBasePositions, miniAnimParams } from '../mockGraphData';
 import type { NodeData } from '../mockGraphData';
 import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 
@@ -131,6 +131,145 @@ export default function GraphModelingCanvas({ selectedNodeId, onSelectNode }: Pr
     [onSelectNode]
   );
 
+  // ── Physics state (refs, never cause re-renders) ──────────────────────────
+  // Keyed by graphNode id. Positions are the node top-left corner in flow space.
+  const parentPosRef = useRef<Record<string, { x: number; y: number }>>({});
+  const parentVelRef = useRef<Record<string, { vx: number; vy: number }>>({});
+  const parentAnchorRef = useRef<Record<string, { x: number; y: number }>>({});
+  const cursorFlowPosRef = useRef<{ x: number; y: number } | null>(null);
+
+  // Seed physics state from the static node positions (runs once on mount).
+  useEffect(() => {
+    mockNodes.forEach(n => {
+      parentPosRef.current[n.id] = { x: n.position.x, y: n.position.y };
+      parentVelRef.current[n.id] = { vx: 0, vy: 0 };
+      parentAnchorRef.current[n.id] = { x: n.position.x, y: n.position.y };
+    });
+  }, []);
+
+  // ── Combined rAF loop: parent physics + mini-node drift, ~30 fps ──────────
+  const frameIdRef = useRef(0);
+  const startTimeRef = useRef<number | null>(null);
+  const lastTickRef = useRef(0);
+
+  useEffect(() => {
+    const FRAME_BUDGET = 1000 / 30;
+
+    // Nucleus radius for center-of-mass calculations (matches GraphNode NUCLEUS_SIZE/2).
+    const NR = 60;
+    // Physics constants — tuned for soft-gravity feel, not rigid physics.
+    const ANCHOR_K = 0.018;      // spring pull back to home position
+    const CURSOR_FORCE = 3.2;    // cursor attractor scale
+    const CURSOR_RADIUS = 420;   // flow-unit influence radius
+    const MIN_CURSOR_DIST = 90;  // don't let cursor collapse the nucleus onto itself
+    const REPEL_K = 0.28;        // pairwise repulsion scale
+    const REPEL_DIST = 210;      // minimum center-to-center distance (flow units)
+    const DAMPING = 0.88;        // velocity damping — higher = smoother but slower response
+    const MAX_SPEED = 1.6;       // px/frame cap — prevents jarring jumps
+
+    const loop = (timestamp: number) => {
+      frameIdRef.current = requestAnimationFrame(loop);
+
+      if (timestamp - lastTickRef.current < FRAME_BUDGET) return;
+      lastTickRef.current = timestamp;
+
+      if (startTimeRef.current === null) startTimeRef.current = timestamp;
+      const t = (timestamp - startTimeRef.current) / 1000;
+
+      // ── Parent nucleus physics ──────────────────────────────────────────
+      const parentIds = Object.keys(parentPosRef.current);
+      const cursor = cursorFlowPosRef.current;
+
+      for (const id of parentIds) {
+        const pos = parentPosRef.current[id];
+        const vel = parentVelRef.current[id];
+        const anchor = parentAnchorRef.current[id];
+
+        // Nucleus center (for force calculations).
+        const cx = pos.x + NR;
+        const cy = pos.y + NR;
+
+        let fx = 0, fy = 0;
+
+        // 1. Anchor spring — gently pulls nucleus back toward its home position.
+        fx += -(pos.x - anchor.x) * ANCHOR_K;
+        fy += -(pos.y - anchor.y) * ANCHOR_K;
+
+        // 2. Cursor attraction — falls off quadratically with distance.
+        if (cursor) {
+          const dx = cursor.x - cx;
+          const dy = cursor.y - cy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > MIN_CURSOR_DIST && dist < CURSOR_RADIUS) {
+            const t2 = 1 - dist / CURSOR_RADIUS;
+            const str = (t2 * t2 * CURSOR_FORCE) / dist;
+            fx += dx * str;
+            fy += dy * str;
+          }
+        }
+
+        // 3. Pairwise repulsion — keeps nuclei from overlapping.
+        for (const otherId of parentIds) {
+          if (otherId === id) continue;
+          const other = parentPosRef.current[otherId];
+          const ocx = other.x + NR;
+          const ocy = other.y + NR;
+          const dx = cx - ocx;
+          const dy = cy - ocy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > 0.1 && dist < REPEL_DIST) {
+            const str = ((REPEL_DIST - dist) * REPEL_K) / dist;
+            fx += dx * str;
+            fy += dy * str;
+          }
+        }
+
+        // Integrate velocity with damping, clamp speed.
+        vel.vx = (vel.vx + fx) * DAMPING;
+        vel.vy = (vel.vy + fy) * DAMPING;
+        const speed = Math.sqrt(vel.vx * vel.vx + vel.vy * vel.vy);
+        if (speed > MAX_SPEED) {
+          vel.vx *= MAX_SPEED / speed;
+          vel.vy *= MAX_SPEED / speed;
+        }
+
+        pos.x += vel.vx;
+        pos.y += vel.vy;
+      }
+
+      // ── Flush both parent positions and mini drift into React state ───────
+      setBaseNodes(prev =>
+        prev.map(node => {
+          if (node.type === 'graphNode') {
+            const pos = parentPosRef.current[node.id];
+            return pos ? { ...node, position: { x: pos.x, y: pos.y } } : node;
+          }
+
+          if (node.type === 'miniNode') {
+            const base = miniBasePositions[node.id];
+            const p = miniAnimParams[node.id];
+            if (!base || !p) return node;
+            const x =
+              base.x +
+              Math.sin(t * p.speed + p.phase) * p.amplitudeX +
+              Math.sin(t * p.speed * 0.37 + p.phase + 1.3) * (p.amplitudeX * 0.42);
+            const y =
+              base.y +
+              Math.cos(t * p.speed * 0.8 + p.phase) * p.amplitudeY +
+              Math.sin(t * p.speed * 0.53 + p.phase + 0.7) * (p.amplitudeY * 0.5);
+            return { ...node, position: { x, y } };
+          }
+
+          return node;
+        })
+      );
+    };
+
+    frameIdRef.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(frameIdRef.current);
+  }, []); // empty — setBaseNodes and all physics refs are stable
+
+  // ── Mouse handlers ────────────────────────────────────────────────────────
   const proximityThrottle = useRef(0);
 
   const handleMouseMove = useCallback(
@@ -140,30 +279,34 @@ export default function GraphModelingCanvas({ selectedNodeId, onSelectNode }: Pr
       proximityThrottle.current = now;
 
       const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-      const threshold = 180 / getZoom();
+      cursorFlowPosRef.current = flowPos;
 
+      // Proximity focus: find closest nucleus center within threshold.
+      const threshold = 200 / getZoom();
       let nearestId: string | null = null;
       let nearestDist = threshold;
 
-      for (const n of baseNodes) {
-        if (n.type !== 'graphNode') continue;
-        const cx = n.position.x + 100;
-        const cy = n.position.y + 75;
+      for (const [nodeId, pos] of Object.entries(parentPosRef.current)) {
+        const cx = pos.x + 60;
+        const cy = pos.y + 60;
         const dx = flowPos.x - cx;
         const dy = flowPos.y - cy;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < nearestDist) {
           nearestDist = dist;
-          nearestId = n.id;
+          nearestId = nodeId;
         }
       }
 
       setProximityFocusId(nearestId);
     },
-    [baseNodes, screenToFlowPosition, getZoom]
+    [screenToFlowPosition, getZoom]
   );
 
-  const handleMouseLeave = useCallback(() => setProximityFocusId(null), []);
+  const handleMouseLeave = useCallback(() => {
+    setProximityFocusId(null);
+    cursorFlowPosRef.current = null;
+  }, []);
 
   const onPaneClick = useCallback(() => onSelectNode(null), [onSelectNode]);
 

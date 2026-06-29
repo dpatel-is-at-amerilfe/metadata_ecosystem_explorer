@@ -15,11 +15,74 @@ export type MiniNodeData = {
   parentId: string;
 };
 
+export type MiniAnimParams = {
+  phase: number;
+  speed: number;
+  amplitudeX: number;
+  amplitudeY: number;
+};
+
+// Static base positions relative to each parent — never mutated, only animation offsets are added.
+export const miniBasePositions: Record<string, { x: number; y: number }> = {
+  'mini-person-1':  { x: -195, y: -165 },
+  'mini-person-2':  { x: -245, y:  -60 },
+  'mini-person-3':  { x: -190, y:   65 },
+  'mini-company-1': { x:   40, y: -150 },
+  'mini-company-2': { x:  210, y:  -95 },
+  'mini-company-3': { x:  295, y:   10 },
+  'mini-product-1': { x:  240, y:  -65 },
+  'mini-product-2': { x:  265, y:   30 },
+  'mini-product-3': { x:  240, y:  120 },
+  'mini-order-1':   { x: -200, y:  -50 },
+  'mini-order-2':   { x: -225, y:   50 },
+  'mini-order-3':   { x: -150, y:  170 },
+  'mini-invoice-1': { x:  245, y:  -40 },
+  'mini-invoice-2': { x:  265, y:   50 },
+  'mini-invoice-3': { x:  235, y:  140 },
+  'mini-address-1': { x:  170, y:  160 },
+  'mini-address-2': { x:   40, y:  260 },
+  'mini-address-3': { x:  -30, y:  200 },
+  'mini-tag-1':     { x: -140, y:  135 },
+  'mini-tag-2':     { x:   10, y:  190 },
+  'mini-tag-3':     { x:  135, y:  180 },
+  'mini-deep-1':    { x: -170, y:  -60 },
+  'mini-deep-2':    { x: -205, y:   35 },
+  'mini-deep-3':    { x: -160, y:  175 },
+};
+
+// Per-node organic drift parameters — each node has a unique phase/speed so they never move in unison.
+export const miniAnimParams: Record<string, MiniAnimParams> = {
+  'mini-person-1':  { phase: 0.00, speed: 0.32, amplitudeX: 20, amplitudeY: 14 },
+  'mini-person-2':  { phase: 2.09, speed: 0.25, amplitudeX: 16, amplitudeY: 18 },
+  'mini-person-3':  { phase: 4.18, speed: 0.38, amplitudeX: 22, amplitudeY: 12 },
+  'mini-company-1': { phase: 0.52, speed: 0.28, amplitudeX: 18, amplitudeY: 20 },
+  'mini-company-2': { phase: 1.57, speed: 0.41, amplitudeX: 14, amplitudeY: 16 },
+  'mini-company-3': { phase: 3.66, speed: 0.22, amplitudeX: 24, amplitudeY: 10 },
+  'mini-product-1': { phase: 1.05, speed: 0.35, amplitudeX: 15, amplitudeY: 22 },
+  'mini-product-2': { phase: 3.14, speed: 0.30, amplitudeX: 20, amplitudeY: 14 },
+  'mini-product-3': { phase: 5.23, speed: 0.44, amplitudeX: 12, amplitudeY: 18 },
+  'mini-order-1':   { phase: 0.78, speed: 0.27, amplitudeX: 22, amplitudeY: 16 },
+  'mini-order-2':   { phase: 2.61, speed: 0.39, amplitudeX: 17, amplitudeY: 12 },
+  'mini-order-3':   { phase: 4.71, speed: 0.23, amplitudeX: 14, amplitudeY: 20 },
+  'mini-invoice-1': { phase: 1.30, speed: 0.36, amplitudeX: 19, amplitudeY: 15 },
+  'mini-invoice-2': { phase: 3.92, speed: 0.29, amplitudeX: 23, amplitudeY: 11 },
+  'mini-invoice-3': { phase: 0.26, speed: 0.42, amplitudeX: 15, amplitudeY: 19 },
+  'mini-address-1': { phase: 2.35, speed: 0.31, amplitudeX: 21, amplitudeY: 13 },
+  'mini-address-2': { phase: 4.45, speed: 0.26, amplitudeX: 16, amplitudeY: 21 },
+  'mini-address-3': { phase: 0.96, speed: 0.43, amplitudeX: 13, amplitudeY: 17 },
+  'mini-tag-1':     { phase: 3.40, speed: 0.34, amplitudeX: 20, amplitudeY: 16 },
+  'mini-tag-2':     { phase: 1.74, speed: 0.28, amplitudeX: 17, amplitudeY: 13 },
+  'mini-tag-3':     { phase: 5.55, speed: 0.40, amplitudeX: 24, amplitudeY: 10 },
+  'mini-deep-1':    { phase: 0.61, speed: 0.33, amplitudeX: 18, amplitudeY: 20 },
+  'mini-deep-2':    { phase: 2.88, speed: 0.45, amplitudeX: 12, amplitudeY: 14 },
+  'mini-deep-3':    { phase: 4.97, speed: 0.24, amplitudeX: 22, amplitudeY: 16 },
+};
+
 export const mockNodes: Node<NodeData>[] = [
   {
     id: 'person',
     type: 'graphNode',
-    position: { x: 280, y: 320 },
+    position: { x: 200, y: 250 },
     data: {
       label: 'Person',
       subtitle: 'Entity',
@@ -42,7 +105,7 @@ export const mockNodes: Node<NodeData>[] = [
   {
     id: 'company',
     type: 'graphNode',
-    position: { x: 680, y: 140 },
+    position: { x: 720, y: 60 },
     data: {
       label: 'Company',
       subtitle: 'Entity',
@@ -63,7 +126,7 @@ export const mockNodes: Node<NodeData>[] = [
   {
     id: 'product',
     type: 'graphNode',
-    position: { x: 760, y: 360 },
+    position: { x: 960, y: 320 },
     data: {
       label: 'Product',
       subtitle: 'Entity',
@@ -84,7 +147,7 @@ export const mockNodes: Node<NodeData>[] = [
   {
     id: 'order',
     type: 'graphNode',
-    position: { x: 180, y: 560 },
+    position: { x: 80, y: 560 },
     data: {
       label: 'Order',
       subtitle: 'Entity',
@@ -106,7 +169,7 @@ export const mockNodes: Node<NodeData>[] = [
   {
     id: 'invoice',
     type: 'graphNode',
-    position: { x: 760, y: 580 },
+    position: { x: 940, y: 620 },
     data: {
       label: 'Invoice',
       subtitle: 'Entity',
@@ -127,7 +190,7 @@ export const mockNodes: Node<NodeData>[] = [
   {
     id: 'address',
     type: 'graphNode',
-    position: { x: 660, y: 520 },
+    position: { x: 610, y: 490 },
     data: {
       label: 'Address',
       subtitle: 'Entity',
@@ -148,7 +211,7 @@ export const mockNodes: Node<NodeData>[] = [
   {
     id: 'tag',
     type: 'graphNode',
-    position: { x: 420, y: 620 },
+    position: { x: 370, y: 700 },
     data: {
       label: 'Tag',
       subtitle: 'Entity',
@@ -168,7 +231,7 @@ export const mockNodes: Node<NodeData>[] = [
   {
     id: 'deep',
     type: 'graphNode',
-    position: { x: 80, y: 440 },
+    position: { x: -30, y: 360 },
     data: {
       label: 'Deep',
       subtitle: 'Entity',

@@ -58,6 +58,12 @@ html, body, #root {
   to   { stroke-dashoffset: -38; }
 }
 
+/* Slow crawl for parent→satellite tether lines */
+@keyframes tether-pulse {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -13; }
+}
+
 ::-webkit-scrollbar {
   width: 4px;
 }

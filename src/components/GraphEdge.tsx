@@ -29,17 +29,21 @@ function GraphEdge({
 
   const isParent = data?.isParent;
 
-  // Parent-child satellite edges: even more subtle, no glow, no animation
+  // Gravitational tether: faint animated dash that slowly crawls, softly brightens on focus.
   if (isParent) {
     return (
       <path
         id={id}
         d={edgePath}
         fill="none"
-        stroke={selected ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.05)'}
-        strokeWidth={selected ? 0.8 : 0.6}
-        strokeDasharray="2 8"
-        style={{ transition: 'stroke 0.4s, stroke-width 0.4s', pointerEvents: 'none' }}
+        stroke={selected ? 'rgba(255,255,255,0.20)' : 'rgba(255,255,255,0.07)'}
+        strokeWidth={selected ? 0.9 : 0.55}
+        strokeDasharray="3 10"
+        style={{
+          animation: 'tether-pulse 5s linear infinite',
+          transition: 'stroke 0.5s, stroke-width 0.5s',
+          pointerEvents: 'none',
+        }}
       />
     );
   }
