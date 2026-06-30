@@ -24,15 +24,16 @@ function MiniGraphNode({ data }: NodeProps & { data: MiniNodeData }) {
       <Handle type="source" position={Position.Right} style={{ opacity: 0, width: 6, height: 6 }} />
       <div
         style={{
-          width: 5,
-          height: 5,
+          width: 10,
+          height: 10,
           borderRadius: '50%',
           background: colors.border,
           opacity: 0.9,
           flexShrink: 0,
         }}
       />
-      <span style={{ fontSize: 11, fontWeight: 500, color: '#8b98b4', letterSpacing: '0.01em' }}>
+      {/* Mini Node Label */}
+      <span style={{ fontSize: 17, fontWeight: 500, color: '#8b98b4', letterSpacing: '0.05em' }}>
         {data.label}
       </span>
     </div>

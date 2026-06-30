@@ -4,7 +4,7 @@ import type { NodeProps } from '@xyflow/react';
 import { nodeColors } from '../mockGraphData';
 import type { NodeData } from '../mockGraphData';
 
-export const NUCLEUS_SIZE = 120;
+export const NUCLEUS_SIZE = 140;
 export const NUCLEUS_RADIUS = NUCLEUS_SIZE / 2;
 
 type GraphNodeProps = NodeProps & { data: NodeData; selected?: boolean };
@@ -48,10 +48,10 @@ function GraphNode({ data, selected }: GraphNodeProps) {
       />
 
       <span style={{ fontSize: 26, lineHeight: 1, marginBottom: 2 }}>{data.icon}</span>
-
+{/* Actual Parent Node Label */}
       <span
         style={{
-          fontSize: 11,
+          fontSize: 18,
           fontWeight: 600,
           color: selected ? colors.border : `${colors.border}bb`,
           letterSpacing: '0.05em',
@@ -61,12 +61,12 @@ function GraphNode({ data, selected }: GraphNodeProps) {
       >
         {data.label}
       </span>
-
+  {/* Parent Node Subtitle */}
       <span
         style={{
-          fontSize: 8,
-          fontWeight: 400,
-          color: 'rgba(255,255,255,0.25)',
+          fontSize: 12,
+          fontWeight: 500,
+          color: 'rgba(255, 255, 255, 0.85)',
           letterSpacing: '0.10em',
           textTransform: 'uppercase',
         }}
