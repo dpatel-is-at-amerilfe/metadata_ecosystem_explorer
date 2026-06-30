@@ -6,6 +6,7 @@ import { computeLayout } from './lib/layout';
 import { getNeighborhood } from './lib/lineage';
 import { CATEGORY_ORDER, RELATIONSHIP_ORDER } from './lib/theme';
 import GraphCanvas from './components/GraphCanvas';
+import GravityGraph from './components/GravityGraph';
 import Toolbar from './components/Toolbar';
 import ControlsBar from './components/ControlsBar';
 import SidePanel, { type PanelTab } from './components/SidePanel';
@@ -15,6 +16,7 @@ const HIERARCHY_ID = 'Hierarchy_Base_Table';
 function AppInner() {
   const rf = useReactFlow();
 
+  const [viewMode, setViewMode] = useState<'flow' | 'gravity'>('flow');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hiddenCategories, setHiddenCategories] = useState<Set<NodeCategory>>(
     () => new Set(),
@@ -171,45 +173,61 @@ function AppInner() {
 
       <div className="flex-1 flex min-h-0">
         <div className="relative flex-1 min-w-0">
-          <GraphCanvas
-            nodes={metadataNodes}
-            edges={metadataEdges}
-            positions={positions}
-            byId={byId}
-            degree={degree}
-            selectedId={selectedId}
-            neighborhood={neighborhood}
-            hiddenCategories={hiddenCategories}
-            hiddenRelationships={hiddenRelationships}
-            searchMatches={searchMatches}
-            hasSearch={hasSearch}
-            onSelect={onSelect}
-            onClearSelection={onResetSelection}
-          />
-          <ControlsBar
-            columnsHidden={columnsHidden}
-            onShowAll={onShowAll}
-            onToggleColumns={onToggleColumns}
-            onFocusHierarchy={onFocusHierarchy}
-            onFocusReports={onFocusReports}
-            onResetGraph={onResetGraph}
-          />
+          {viewMode === 'gravity' ? (
+            <GravityGraph />
+          ) : (
+            <>
+              <GraphCanvas
+                nodes={metadataNodes}
+                edges={metadataEdges}
+                positions={positions}
+                byId={byId}
+                degree={degree}
+                selectedId={selectedId}
+                neighborhood={neighborhood}
+                hiddenCategories={hiddenCategories}
+                hiddenRelationships={hiddenRelationships}
+                searchMatches={searchMatches}
+                hasSearch={hasSearch}
+                onSelect={onSelect}
+                onClearSelection={onResetSelection}
+              />
+              <ControlsBar
+                columnsHidden={columnsHidden}
+                onShowAll={onShowAll}
+                onToggleColumns={onToggleColumns}
+                onFocusHierarchy={onFocusHierarchy}
+                onFocusReports={onFocusReports}
+                onResetGraph={onResetGraph}
+              />
+            </>
+          )}
+
+          {/* View mode toggle */}
+          <button
+            onClick={() => setViewMode((v) => v === 'flow' ? 'gravity' : 'flow')}
+            className="absolute top-4 right-4 z-20 flex items-center gap-1.5 h-8 px-3 rounded-md text-[11.5px] font-medium text-ink-dim hover:text-ink bg-panel/85 hover:bg-panel-2 backdrop-blur border border-line transition-colors shadow-xl whitespace-nowrap"
+          >
+            {viewMode === 'gravity' ? '← Flow View' : 'Gravity Field →'}
+          </button>
         </div>
 
-        <SidePanel
-          tab={tab}
-          setTab={setTab}
-          selectedNode={selectedNode}
-          edges={metadataEdges}
-          byId={byId}
-          onSelectNode={onSelect}
-          nodeCounts={nodeCounts}
-          edgeCounts={edgeCounts}
-          hiddenCategories={hiddenCategories}
-          hiddenRelationships={hiddenRelationships}
-          toggleCategory={toggleCategory}
-          toggleRelationship={toggleRelationship}
-        />
+        {viewMode === 'flow' && (
+          <SidePanel
+            tab={tab}
+            setTab={setTab}
+            selectedNode={selectedNode}
+            edges={metadataEdges}
+            byId={byId}
+            onSelectNode={onSelect}
+            nodeCounts={nodeCounts}
+            edgeCounts={edgeCounts}
+            hiddenCategories={hiddenCategories}
+            hiddenRelationships={hiddenRelationships}
+            toggleCategory={toggleCategory}
+            toggleRelationship={toggleRelationship}
+          />
+        )}
       </div>
     </div>
   );

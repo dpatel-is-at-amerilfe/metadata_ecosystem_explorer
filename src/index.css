@@ -84,8 +84,17 @@ body {
   animation: pulseHalo 2.2s ease-in-out infinite;
 }
 
+/* Subtle vertical float for entity cards — keeps the graph alive without
+   affecting edge anchors (which are React Flow coordinate-based, not CSS). */
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-2px); }
+}
+.card-float {
+  animation: cardFloat 7s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .halo-pulse {
-    animation: none;
-  }
+  .halo-pulse,
+  .card-float { animation: none; }
 }

@@ -1,12 +1,12 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ReactFlow,
   Background,
   BackgroundVariant,
   Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   type Node,
   type Edge,
 } from '@xyflow/react';
@@ -18,19 +18,15 @@ import type {
 } from '../types';
 import type { XY } from '../lib/layout';
 import type { Neighborhood } from '../lib/lineage';
-import { CATEGORY_STYLES } from '../lib/theme';
+import { getNeighborhood } from '../lib/lineage';
 import MetadataNodeView, { type MetadataNodeData } from './MetadataNode';
 import FloatingEdge, { type MetadataEdgeData } from './FloatingEdge';
 
 const nodeTypes = { metadata: MetadataNodeView };
 const edgeTypes = { floating: FloatingEdge };
 
-// Single source of truth for dot diameter — MetadataNode renders it and
-// FloatingEdge reads node.data.dotSize so the line lands on the dot center.
-function dotSizeFor(cat: NodeCategory, isHub: boolean) {
-  const base = cat === 'Column' ? 14 : cat === 'Business Domain' ? 30 : 22;
-  return isHub ? base + 10 : base;
-}
+// Golden-ratio phase spread — each node breathes at a different point in the cycle.
+const PHI = 1.6180339887;
 
 interface GraphCanvasProps {
   nodes: MetadataNode[];
@@ -63,11 +59,26 @@ export default function GraphCanvas({
   onSelect,
   onClearSelection,
 }: GraphCanvasProps) {
-  // Build the React Flow node/edge arrays ONCE. Subsequent updates only touch
-  // `.data` and `.hidden`, never `.position`, so user drags are preserved.
+  const rf = useReactFlow();
+
+  // Hover state is local and transient — never propagates to App.
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  const hoveredNeighborhood = useMemo(
+    () => (hoveredId ? getNeighborhood(hoveredId, edges) : null),
+    [hoveredId, edges],
+  );
+
+  // Stable ref for base positions (used by click-to-focus camera).
+  const basePosRef = useRef<Record<string, XY>>(positions);
+
+  // 120ms delay prevents hover highlights firing on fast mouse sweeps.
+  const enterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Initial React Flow node / edge arrays ────────────────────────────────────
   const initialNodes = useMemo<Node<MetadataNodeData>[]>(
     () =>
-      nodes.map((n) => ({
+      nodes.map((n, i) => ({
         id: n.id,
         type: 'metadata',
         position: positions[n.id] ?? { x: 0, y: 0 },
@@ -78,10 +89,11 @@ export default function GraphCanvas({
           highlighted: false,
           dimmed: false,
           isHub: false,
-          dotSize: dotSizeFor(n.category, false),
+          // Stagger the CSS cardFloat animation so every card breathes independently.
+          breatheDelay: (i * PHI * 7) % 7,
         },
       })),
-    // Intentionally run once: positions/degree are stable for the session.
+    // Intentionally stable — positions and degree don't change within a session.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
@@ -97,7 +109,7 @@ export default function GraphCanvas({
           relationship: e.relationship,
           highlighted: false,
           dim: false,
-          showLabel: true,
+          showLabel: false, // labels hidden until a node is focused
         },
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,8 +119,12 @@ export default function GraphCanvas({
   const [rfNodes, setRfNodes, onNodesChange] = useNodesState(initialNodes);
   const [rfEdges, setRfEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  // Recompute node visual flags whenever selection / search / visibility change.
+  // ── Node visual-flag sync ─────────────────────────────────────────────────────
+  // Selection takes full priority over hover.
   useEffect(() => {
+    const activeId = selectedId ?? hoveredId;
+    const activeNbr: Neighborhood | null = selectedId ? neighborhood : hoveredNeighborhood;
+
     setRfNodes((prev) =>
       prev.map((node) => {
         const meta = (node.data as MetadataNodeData).meta;
@@ -117,12 +133,12 @@ export default function GraphCanvas({
         let dimmed = false;
         let isHub = false;
 
-        if (selectedId) {
-          if (node.id === selectedId) {
-            selected = true;
+        if (activeId) {
+          if (node.id === activeId) {
+            selected = node.id === selectedId;
             isHub = true;
             highlighted = true;
-          } else if (neighborhood?.connected.has(node.id)) {
+          } else if (activeNbr?.connected.has(node.id)) {
             highlighted = true;
           } else {
             dimmed = true;
@@ -141,22 +157,26 @@ export default function GraphCanvas({
             highlighted,
             dimmed,
             isHub,
-            dotSize: dotSizeFor(meta.category, isHub),
           },
         };
       }),
     );
   }, [
     selectedId,
+    hoveredId,
     neighborhood,
+    hoveredNeighborhood,
     hiddenCategories,
     searchMatches,
     hasSearch,
     setRfNodes,
   ]);
 
-  // Recompute edge visual flags / visibility.
+  // ── Edge visual-flag sync ────────────────────────────────────────────────────
   useEffect(() => {
+    const activeId = selectedId ?? hoveredId;
+    const activeNbr: Neighborhood | null = selectedId ? neighborhood : hoveredNeighborhood;
+
     setRfEdges((prev) =>
       prev.map((edge) => {
         const data = edge.data as MetadataEdgeData;
@@ -171,8 +191,8 @@ export default function GraphCanvas({
         let dim = false;
         let showLabel = false;
 
-        if (selectedId) {
-          if (neighborhood?.connectedEdges.has(edge.id)) {
+        if (activeId) {
+          if (activeNbr?.connectedEdges.has(edge.id)) {
             highlighted = true;
             showLabel = true;
           } else {
@@ -181,16 +201,10 @@ export default function GraphCanvas({
         } else if (hasSearch) {
           const bothMatch =
             searchMatches.has(edge.source) && searchMatches.has(edge.target);
-          if (bothMatch) {
-            highlighted = true;
-            showLabel = true;
-          } else {
-            dim = true;
-          }
-        } else {
-          // Default view mirrors the reference UI: every edge shows its label.
-          showLabel = true;
+          if (bothMatch) { highlighted = true; showLabel = true; }
+          else dim = true;
         }
+        // Default: no labels, edges stay subtle (handled in FloatingEdge defaults).
 
         return {
           ...edge,
@@ -201,7 +215,9 @@ export default function GraphCanvas({
     );
   }, [
     selectedId,
+    hoveredId,
     neighborhood,
+    hoveredNeighborhood,
     hiddenRelationships,
     hiddenCategories,
     byId,
@@ -209,6 +225,56 @@ export default function GraphCanvas({
     hasSearch,
     setRfEdges,
   ]);
+
+  // ── Hover — visual emphasis only, no camera movement ────────────────────────
+  const onNodeMouseEnter = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      if (selectedId) return;
+      if (enterTimerRef.current) clearTimeout(enterTimerRef.current);
+      enterTimerRef.current = setTimeout(() => {
+        enterTimerRef.current = null;
+        setHoveredId(node.id);
+      }, 120);
+    },
+    [selectedId],
+  );
+
+  const onNodeMouseLeave = useCallback(() => {
+    if (enterTimerRef.current) {
+      clearTimeout(enterTimerRef.current);
+      enterTimerRef.current = null;
+    }
+    setHoveredId(null);
+  }, []);
+
+  // ── Click — commit selection + smooth camera focus ───────────────────────────
+  const onNodeClick = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      onSelect(node.id);
+      const base = basePosRef.current[node.id];
+      if (base) {
+        rf.setCenter(base.x, base.y, { zoom: 1.1, duration: 600 });
+      }
+    },
+    [onSelect, rf],
+  );
+
+  // ── Pane click — clear selection + return to overview ───────────────────────
+  const onPaneClick = useCallback(() => {
+    onClearSelection();
+    rf.fitView({ padding: 0.18, duration: 650 });
+  }, [onClearSelection, rf]);
+
+  // When selection changes externally (toolbar reset), also clear any pending hover.
+  useEffect(() => {
+    if (selectedId) {
+      if (enterTimerRef.current) {
+        clearTimeout(enterTimerRef.current);
+        enterTimerRef.current = null;
+      }
+      setHoveredId(null);
+    }
+  }, [selectedId]);
 
   return (
     <ReactFlow
@@ -218,32 +284,41 @@ export default function GraphCanvas({
       onEdgesChange={onEdgesChange}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
-      onNodeClick={(_, node) => onSelect(node.id)}
-      onPaneClick={onClearSelection}
-      minZoom={0.2}
-      maxZoom={2.5}
+      onNodeClick={onNodeClick}
+      onPaneClick={onPaneClick}
+      onNodeMouseEnter={onNodeMouseEnter}
+      onNodeMouseLeave={onNodeMouseLeave}
+      nodesDraggable={false}
+      minZoom={0.1}
+      maxZoom={2}
       fitView
-      fitViewOptions={{ padding: 0.2 }}
+      fitViewOptions={{ padding: 0.18 }}
       nodesConnectable={false}
       proOptions={{ hideAttribution: true }}
       defaultEdgeOptions={{ type: 'floating' }}
     >
-      <Background variant={BackgroundVariant.Dots} gap={28} size={1} color="#16203a" />
-      <MiniMap
-        pannable
-        zoomable
-        nodeColor={(n) =>
-          CATEGORY_STYLES[(n.data as MetadataNodeData).meta.category]?.color ?? '#334155'
-        }
-        nodeStrokeWidth={0}
-        maskColor="rgba(5,8,16,0.78)"
+      <Background variant={BackgroundVariant.Dots} gap={32} size={1} color="#111827" />
+      <div
         style={{
-          background: '#0a0f1c',
-          border: '1px solid #1d2740',
-          borderRadius: 10,
+          position: 'absolute',
+          bottom: 24,
+          left: 16,
+          opacity: 0.4,
+          transition: 'opacity 200ms ease',
+          zIndex: 5,
         }}
-      />
-      <Controls showInteractive={false} />
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.4'; }}
+      >
+        <Controls
+          showInteractive={false}
+          style={{
+            background: 'rgba(10,15,28,0.85)',
+            border: '1px solid #1d2740',
+            borderRadius: 10,
+          }}
+        />
+      </div>
     </ReactFlow>
   );
 }

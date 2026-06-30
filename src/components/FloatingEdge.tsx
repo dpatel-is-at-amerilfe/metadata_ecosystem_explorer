@@ -19,12 +19,12 @@ export interface MetadataEdgeData extends Record<string, unknown> {
   showLabel: boolean;
 }
 
-function dotAnchor(node: InternalNode<Node>) {
+// Anchor to the center of the rendered card (uses React Flow's measured dimensions).
+function cardCenter(node: InternalNode<Node>) {
   const { x, y } = node.internals.positionAbsolute;
-  const w = node.measured?.width ?? 40;
-  const dotSize = (node.data?.dotSize as number | undefined) ?? 22;
-  // Dot sits at the top-center of the node wrapper; anchor edges to its center.
-  return { x: x + w / 2, y: y + dotSize / 2 };
+  const w = node.measured?.width ?? 220;
+  const h = node.measured?.height ?? 68;
+  return { x: x + w / 2, y: y + h / 2 };
 }
 
 function relativePosition(from: { x: number; y: number }, to: { x: number; y: number }) {
@@ -45,8 +45,8 @@ function FloatingEdgeView({ id, source, target, data, markerEnd }: EdgeProps) {
   const rel = edgeData.relationship;
   const relStyle = RELATIONSHIP_STYLES[rel];
 
-  const sc = dotAnchor(sourceNode);
-  const tc = dotAnchor(targetNode);
+  const sc = cardCenter(sourceNode);
+  const tc = cardCenter(targetNode);
 
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX: sc.x,
@@ -55,12 +55,17 @@ function FloatingEdgeView({ id, source, target, data, markerEnd }: EdgeProps) {
     targetY: tc.y,
     sourcePosition: relativePosition(sc, tc),
     targetPosition: relativePosition(tc, sc),
-    curvature: 0.28,
+    curvature: 0.32,
   });
 
-  const highlighted = edgeData.highlighted;
+  const { highlighted, dim, showLabel } = edgeData;
 
-  // Rotate the label to follow the edge, but keep it upright (flip past vertical).
+  // Default: very thin and quiet so cards read as primary objects.
+  // Highlighted: bright and weighted so connected relationships pop.
+  const strokeWidth = highlighted ? 1.8 : 0.9;
+  const strokeOpacity = dim ? 0.06 : highlighted ? 0.88 : 0.18;
+
+  // Label angle — keep readable by flipping if angle exceeds 90°.
   let angle = (Math.atan2(tc.y - sc.y, tc.x - sc.x) * 180) / Math.PI;
   if (angle > 90) angle -= 180;
   if (angle < -90) angle += 180;
@@ -73,13 +78,14 @@ function FloatingEdgeView({ id, source, target, data, markerEnd }: EdgeProps) {
         markerEnd={markerEnd}
         style={{
           stroke: relStyle.color,
-          strokeWidth: highlighted ? 2 : 1.1,
-          strokeDasharray: relStyle.dashed ? '5 5' : undefined,
-          opacity: highlighted ? 0.95 : 0.35,
-          transition: 'opacity 160ms ease, stroke-width 160ms ease',
+          strokeWidth,
+          strokeOpacity,
+          strokeDasharray: relStyle.dashed ? '5 4' : undefined,
+          transition: 'stroke-opacity 200ms ease, stroke-width 200ms ease',
         }}
       />
-      {edgeData.showLabel && (
+      {/* Labels only appear when the edge is part of a focused neighborhood */}
+      {showLabel && highlighted && (
         <EdgeLabelRenderer>
           <div
             style={{
@@ -88,14 +94,13 @@ function FloatingEdgeView({ id, source, target, data, markerEnd }: EdgeProps) {
               pointerEvents: 'none',
               fontSize: 9,
               fontWeight: 500,
-              letterSpacing: '0.02em',
+              letterSpacing: '0.03em',
               padding: '2px 7px',
               borderRadius: 5,
               whiteSpace: 'nowrap',
-              background: highlighted ? '#0f1830' : 'rgba(11,17,30,0.82)',
-              border: `1px solid ${highlighted ? relStyle.color + 'aa' : '#1d2740'}`,
-              color: highlighted ? relStyle.color : '#6b779a',
-              opacity: highlighted ? 1 : 0.85,
+              background: '#0a0f1c',
+              border: `1px solid ${relStyle.color}88`,
+              color: relStyle.color,
             }}
           >
             {rel}
