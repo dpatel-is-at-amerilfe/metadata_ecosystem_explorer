@@ -1,5 +1,7 @@
 import type { Node, Edge } from '@xyflow/react';
 
+// ── Public types ──────────────────────────────────────────────────────────────
+
 export type NodeData = {
   label: string;
   subtitle: string;
@@ -9,6 +11,7 @@ export type NodeData = {
   relationshipCounts?: { label: string; count: number }[];
 };
 
+// Kept for MiniGraphNode.tsx import compatibility — no mini nodes are rendered.
 export type MiniNodeData = {
   label: string;
   color: 'purple' | 'teal' | 'blue' | 'orange' | 'slate';
@@ -22,375 +25,7 @@ export type MiniAnimParams = {
   amplitudeY: number;
 };
 
-// Static base positions relative to each parent — never mutated, only animation offsets are added.
-export const miniBasePositions: Record<string, { x: number; y: number }> = {
-  'mini-person-1':  { x: -195, y: -165 },
-  'mini-person-2':  { x: -245, y:  -60 },
-  'mini-person-3':  { x: -190, y:   65 },
-  'mini-company-1': { x:   40, y: -150 },
-  'mini-company-2': { x:  210, y:  -95 },
-  'mini-company-3': { x:  295, y:   10 },
-  'mini-product-1': { x:  240, y:  -65 },
-  'mini-product-2': { x:  265, y:   30 },
-  'mini-product-3': { x:  240, y:  120 },
-  'mini-order-1':   { x: -200, y:  -50 },
-  'mini-order-2':   { x: -225, y:   50 },
-  'mini-order-3':   { x: -150, y:  170 },
-  'mini-invoice-1': { x:  245, y:  -40 },
-  'mini-invoice-2': { x:  265, y:   50 },
-  'mini-invoice-3': { x:  235, y:  140 },
-  'mini-address-1': { x:  170, y:  160 },
-  'mini-address-2': { x:   40, y:  260 },
-  'mini-address-3': { x:  -30, y:  200 },
-  'mini-tag-1':     { x: -140, y:  135 },
-  'mini-tag-2':     { x:   10, y:  190 },
-  'mini-tag-3':     { x:  135, y:  180 },
-  'mini-deep-1':    { x: -170, y:  -60 },
-  'mini-deep-2':    { x: -205, y:   35 },
-  'mini-deep-3':    { x: -160, y:  175 },
-};
-
-// Per-node organic drift parameters — each node has a unique phase/speed so they never move in unison.
-export const miniAnimParams: Record<string, MiniAnimParams> = {
-  'mini-person-1':  { phase: 0.00, speed: 0.32, amplitudeX: 20, amplitudeY: 14 },
-  'mini-person-2':  { phase: 2.09, speed: 0.25, amplitudeX: 16, amplitudeY: 18 },
-  'mini-person-3':  { phase: 4.18, speed: 0.38, amplitudeX: 22, amplitudeY: 12 },
-  'mini-company-1': { phase: 0.52, speed: 0.28, amplitudeX: 18, amplitudeY: 20 },
-  'mini-company-2': { phase: 1.57, speed: 0.41, amplitudeX: 14, amplitudeY: 16 },
-  'mini-company-3': { phase: 3.66, speed: 0.22, amplitudeX: 24, amplitudeY: 10 },
-  'mini-product-1': { phase: 1.05, speed: 0.35, amplitudeX: 15, amplitudeY: 22 },
-  'mini-product-2': { phase: 3.14, speed: 0.30, amplitudeX: 20, amplitudeY: 14 },
-  'mini-product-3': { phase: 5.23, speed: 0.44, amplitudeX: 12, amplitudeY: 18 },
-  'mini-order-1':   { phase: 0.78, speed: 0.27, amplitudeX: 22, amplitudeY: 16 },
-  'mini-order-2':   { phase: 2.61, speed: 0.39, amplitudeX: 17, amplitudeY: 12 },
-  'mini-order-3':   { phase: 4.71, speed: 0.23, amplitudeX: 14, amplitudeY: 20 },
-  'mini-invoice-1': { phase: 1.30, speed: 0.36, amplitudeX: 19, amplitudeY: 15 },
-  'mini-invoice-2': { phase: 3.92, speed: 0.29, amplitudeX: 23, amplitudeY: 11 },
-  'mini-invoice-3': { phase: 0.26, speed: 0.42, amplitudeX: 15, amplitudeY: 19 },
-  'mini-address-1': { phase: 2.35, speed: 0.31, amplitudeX: 21, amplitudeY: 13 },
-  'mini-address-2': { phase: 4.45, speed: 0.26, amplitudeX: 16, amplitudeY: 21 },
-  'mini-address-3': { phase: 0.96, speed: 0.43, amplitudeX: 13, amplitudeY: 17 },
-  'mini-tag-1':     { phase: 3.40, speed: 0.34, amplitudeX: 20, amplitudeY: 16 },
-  'mini-tag-2':     { phase: 1.74, speed: 0.28, amplitudeX: 17, amplitudeY: 13 },
-  'mini-tag-3':     { phase: 5.55, speed: 0.40, amplitudeX: 24, amplitudeY: 10 },
-  'mini-deep-1':    { phase: 0.61, speed: 0.33, amplitudeX: 18, amplitudeY: 20 },
-  'mini-deep-2':    { phase: 2.88, speed: 0.45, amplitudeX: 12, amplitudeY: 14 },
-  'mini-deep-3':    { phase: 4.97, speed: 0.24, amplitudeX: 22, amplitudeY: 16 },
-};
-
-export const mockNodes: Node<NodeData>[] = [
-  {
-    id: 'person',
-    type: 'graphNode',
-    position: { x: 200, y: 250 },
-    data: {
-      label: 'Person',
-      subtitle: 'Entity',
-      icon: '👤',
-      color: 'purple',
-      properties: {
-        name: 'John Doe',
-        age: '32',
-        email: 'john@acme.com',
-        joined: '2023-01-15',
-        status: 'Active',
-      },
-      relationshipCounts: [
-        { label: 'Company', count: 2 },
-        { label: 'Order', count: 4 },
-        { label: 'Invoice', count: 2 },
-      ],
-    },
-  },
-  {
-    id: 'company',
-    type: 'graphNode',
-    position: { x: 720, y: 60 },
-    data: {
-      label: 'Company',
-      subtitle: 'Entity',
-      icon: '🏢',
-      color: 'teal',
-      properties: {
-        name: 'Acme Corp',
-        industry: 'Technology',
-        founded: '2010',
-        employees: '540',
-      },
-      relationshipCounts: [
-        { label: 'Person', count: 12 },
-        { label: 'Product', count: 8 },
-      ],
-    },
-  },
-  {
-    id: 'product',
-    type: 'graphNode',
-    position: { x: 960, y: 320 },
-    data: {
-      label: 'Product',
-      subtitle: 'Entity',
-      icon: '📦',
-      color: 'blue',
-      properties: {
-        name: 'Pro License',
-        sku: 'PRD-0042',
-        price: '$299',
-        category: 'Software',
-      },
-      relationshipCounts: [
-        { label: 'Order', count: 18 },
-        { label: 'Company', count: 3 },
-      ],
-    },
-  },
-  {
-    id: 'order',
-    type: 'graphNode',
-    position: { x: 80, y: 560 },
-    data: {
-      label: 'Order',
-      subtitle: 'Entity',
-      icon: '🛒',
-      color: 'blue',
-      properties: {
-        orderId: 'ORD-20045',
-        date: '2024-03-10',
-        total: '$598',
-        status: 'Fulfilled',
-      },
-      relationshipCounts: [
-        { label: 'Person', count: 1 },
-        { label: 'Product', count: 2 },
-        { label: 'Invoice', count: 1 },
-      ],
-    },
-  },
-  {
-    id: 'invoice',
-    type: 'graphNode',
-    position: { x: 940, y: 620 },
-    data: {
-      label: 'Invoice',
-      subtitle: 'Entity',
-      icon: '🧾',
-      color: 'slate',
-      properties: {
-        invoiceId: 'INV-8821',
-        issued: '2024-03-11',
-        due: '2024-04-11',
-        amount: '$598',
-      },
-      relationshipCounts: [
-        { label: 'Order', count: 1 },
-        { label: 'Person', count: 1 },
-      ],
-    },
-  },
-  {
-    id: 'address',
-    type: 'graphNode',
-    position: { x: 610, y: 490 },
-    data: {
-      label: 'Address',
-      subtitle: 'Entity',
-      icon: '📍',
-      color: 'slate',
-      properties: {
-        street: '123 Oak Street',
-        city: 'Austin',
-        state: 'TX',
-        zip: '78701',
-      },
-      relationshipCounts: [
-        { label: 'Person', count: 3 },
-        { label: 'Company', count: 1 },
-      ],
-    },
-  },
-  {
-    id: 'tag',
-    type: 'graphNode',
-    position: { x: 370, y: 700 },
-    data: {
-      label: 'Tag',
-      subtitle: 'Entity',
-      icon: '🏷️',
-      color: 'orange',
-      properties: {
-        name: 'enterprise',
-        category: 'Tier',
-        createdBy: 'admin',
-      },
-      relationshipCounts: [
-        { label: 'Person', count: 7 },
-        { label: 'Deep', count: 2 },
-      ],
-    },
-  },
-  {
-    id: 'deep',
-    type: 'graphNode',
-    position: { x: -30, y: 360 },
-    data: {
-      label: 'Deep',
-      subtitle: 'Entity',
-      icon: '🔮',
-      color: 'slate',
-      properties: {
-        type: 'Inference',
-        model: 'v2.1',
-        confidence: '0.94',
-      },
-      relationshipCounts: [
-        { label: 'Order', count: 2 },
-        { label: 'Tag', count: 5 },
-      ],
-    },
-  },
-];
-
-// Positions below are RELATIVE to the parent node (absolute − parent.position).
-// React Flow uses node.parentId + relative position so children follow the parent when dragged.
-export const miniNodes: Node<MiniNodeData>[] = [
-  // Person (280,320) — upper-left cluster
-  { id: 'mini-person-1', type: 'miniNode', parentId: 'person', position: { x: -195, y: -165 }, data: { label: 'John Doe', color: 'purple', parentId: 'person' } },
-  { id: 'mini-person-2', type: 'miniNode', parentId: 'person', position: { x: -245, y: -60 }, data: { label: 'Priya Shah', color: 'purple', parentId: 'person' } },
-  { id: 'mini-person-3', type: 'miniNode', parentId: 'person', position: { x: -190, y: 65 }, data: { label: 'Marcus Lee', color: 'purple', parentId: 'person' } },
-  // Company (680,140) — upper-right cluster
-  { id: 'mini-company-1', type: 'miniNode', parentId: 'company', position: { x: 40, y: -150 }, data: { label: 'Acme Corp', color: 'teal', parentId: 'company' } },
-  { id: 'mini-company-2', type: 'miniNode', parentId: 'company', position: { x: 210, y: -95 }, data: { label: 'BrightPath', color: 'teal', parentId: 'company' } },
-  { id: 'mini-company-3', type: 'miniNode', parentId: 'company', position: { x: 295, y: 10 }, data: { label: 'Northstar', color: 'teal', parentId: 'company' } },
-  // Product (760,360) — right cluster
-  { id: 'mini-product-1', type: 'miniNode', parentId: 'product', position: { x: 240, y: -65 }, data: { label: 'Pro License', color: 'blue', parentId: 'product' } },
-  { id: 'mini-product-2', type: 'miniNode', parentId: 'product', position: { x: 265, y: 30 }, data: { label: 'Basic Plan', color: 'blue', parentId: 'product' } },
-  { id: 'mini-product-3', type: 'miniNode', parentId: 'product', position: { x: 240, y: 120 }, data: { label: 'Analytics Add-on', color: 'blue', parentId: 'product' } },
-  // Order (180,560) — lower-left cluster
-  { id: 'mini-order-1', type: 'miniNode', parentId: 'order', position: { x: -200, y: -50 }, data: { label: 'ORD-20045', color: 'blue', parentId: 'order' } },
-  { id: 'mini-order-2', type: 'miniNode', parentId: 'order', position: { x: -225, y: 50 }, data: { label: 'ORD-20046', color: 'blue', parentId: 'order' } },
-  { id: 'mini-order-3', type: 'miniNode', parentId: 'order', position: { x: -150, y: 170 }, data: { label: 'ORD-20047', color: 'blue', parentId: 'order' } },
-  // Invoice (760,580) — right cluster
-  { id: 'mini-invoice-1', type: 'miniNode', parentId: 'invoice', position: { x: 245, y: -40 }, data: { label: 'INV-8821', color: 'slate', parentId: 'invoice' } },
-  { id: 'mini-invoice-2', type: 'miniNode', parentId: 'invoice', position: { x: 265, y: 50 }, data: { label: 'INV-8822', color: 'slate', parentId: 'invoice' } },
-  { id: 'mini-invoice-3', type: 'miniNode', parentId: 'invoice', position: { x: 235, y: 140 }, data: { label: 'INV-8823', color: 'slate', parentId: 'invoice' } },
-  // Address (660,520) — below cluster
-  { id: 'mini-address-1', type: 'miniNode', parentId: 'address', position: { x: 170, y: 160 }, data: { label: 'Austin TX', color: 'slate', parentId: 'address' } },
-  { id: 'mini-address-2', type: 'miniNode', parentId: 'address', position: { x: 40, y: 260 }, data: { label: 'Newark NJ', color: 'slate', parentId: 'address' } },
-  { id: 'mini-address-3', type: 'miniNode', parentId: 'address', position: { x: -30, y: 200 }, data: { label: 'Tampa FL', color: 'slate', parentId: 'address' } },
-  // Tag (420,620) — below cluster
-  { id: 'mini-tag-1', type: 'miniNode', parentId: 'tag', position: { x: -140, y: 135 }, data: { label: 'enterprise', color: 'orange', parentId: 'tag' } },
-  { id: 'mini-tag-2', type: 'miniNode', parentId: 'tag', position: { x: 10, y: 190 }, data: { label: 'renewal', color: 'orange', parentId: 'tag' } },
-  { id: 'mini-tag-3', type: 'miniNode', parentId: 'tag', position: { x: 135, y: 180 }, data: { label: 'medicare', color: 'orange', parentId: 'tag' } },
-  // Deep (80,440) — left cluster
-  { id: 'mini-deep-1', type: 'miniNode', parentId: 'deep', position: { x: -170, y: -60 }, data: { label: 'model v2.1', color: 'slate', parentId: 'deep' } },
-  { id: 'mini-deep-2', type: 'miniNode', parentId: 'deep', position: { x: -205, y: 35 }, data: { label: 'confidence 0.94', color: 'slate', parentId: 'deep' } },
-  { id: 'mini-deep-3', type: 'miniNode', parentId: 'deep', position: { x: -160, y: 175 }, data: { label: 'inference run', color: 'slate', parentId: 'deep' } },
-];
-
-export const mockEdges: Edge[] = [
-  {
-    id: 'e-person-company',
-    source: 'person',
-    target: 'company',
-    type: 'graphEdge',
-    data: { label: 'EMPLOYED_BY' },
-  },
-  {
-    id: 'e-person-order',
-    source: 'person',
-    target: 'order',
-    type: 'graphEdge',
-    data: { label: 'OWNS' },
-  },
-  {
-    id: 'e-person-product',
-    source: 'person',
-    target: 'product',
-    type: 'graphEdge',
-    data: { label: 'PURCHASED' },
-  },
-  {
-    id: 'e-person-address',
-    source: 'person',
-    target: 'address',
-    type: 'graphEdge',
-    data: { label: 'LIVES_AT' },
-  },
-  {
-    id: 'e-person-tag',
-    source: 'person',
-    target: 'tag',
-    type: 'graphEdge',
-    data: { label: 'TAGGED_AS' },
-  },
-  {
-    id: 'e-company-product',
-    source: 'company',
-    target: 'product',
-    type: 'graphEdge',
-    data: { label: 'MAKES' },
-  },
-  {
-    id: 'e-order-product',
-    source: 'order',
-    target: 'product',
-    type: 'graphEdge',
-    data: { label: 'CONTAINS' },
-  },
-  {
-    id: 'e-order-invoice',
-    source: 'order',
-    target: 'invoice',
-    type: 'graphEdge',
-    data: { label: 'BILLED_AS' },
-  },
-  {
-    id: 'e-order-deep',
-    source: 'order',
-    target: 'deep',
-    type: 'graphEdge',
-    data: { label: 'HAS_DEEP' },
-  },
-  {
-    id: 'e-deep-tag',
-    source: 'deep',
-    target: 'tag',
-    type: 'graphEdge',
-    data: { label: 'RELATED_TO' },
-  },
-  {
-    id: 'e-invoice-address',
-    source: 'invoice',
-    target: 'address',
-    type: 'graphEdge',
-    data: { label: 'BILLED_TO' },
-  },
-  // Parent → instance edges (subtle, dashed)
-  { id: 'pe-person-1', source: 'person', target: 'mini-person-1', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-person-2', source: 'person', target: 'mini-person-2', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-person-3', source: 'person', target: 'mini-person-3', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-company-1', source: 'company', target: 'mini-company-1', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-company-2', source: 'company', target: 'mini-company-2', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-company-3', source: 'company', target: 'mini-company-3', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-product-1', source: 'product', target: 'mini-product-1', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-product-2', source: 'product', target: 'mini-product-2', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-product-3', source: 'product', target: 'mini-product-3', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-order-1', source: 'order', target: 'mini-order-1', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-order-2', source: 'order', target: 'mini-order-2', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-order-3', source: 'order', target: 'mini-order-3', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-invoice-1', source: 'invoice', target: 'mini-invoice-1', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-invoice-2', source: 'invoice', target: 'mini-invoice-2', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-invoice-3', source: 'invoice', target: 'mini-invoice-3', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-address-1', source: 'address', target: 'mini-address-1', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-address-2', source: 'address', target: 'mini-address-2', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-address-3', source: 'address', target: 'mini-address-3', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-tag-1', source: 'tag', target: 'mini-tag-1', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-tag-2', source: 'tag', target: 'mini-tag-2', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-tag-3', source: 'tag', target: 'mini-tag-3', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-deep-1', source: 'deep', target: 'mini-deep-1', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-deep-2', source: 'deep', target: 'mini-deep-2', type: 'graphEdge', data: { label: '', isParent: true } },
-  { id: 'pe-deep-3', source: 'deep', target: 'mini-deep-3', type: 'graphEdge', data: { label: '', isParent: true } },
-];
+// ── nodeColors — same shape as before ────────────────────────────────────────
 
 export const nodeColors: Record<string, { border: string; glow: string; icon: string; badge: string }> = {
   purple: {
@@ -424,3 +59,427 @@ export const nodeColors: Record<string, { border: string; glow: string; icon: st
     badge: 'bg-slate-800/60 text-slate-400 border-slate-600/50',
   },
 };
+
+// ── Raw data types ────────────────────────────────────────────────────────────
+
+type GrpRec = { id: string; label: string; memberCount: number };
+type SysRec = {
+  id: string;
+  label: string;
+  type: 'system' | 'subsystem';
+  systemCode: string;
+  systemGroup: string;
+  systemType: string;
+  dataZone: string;
+};
+type EntRec = { id: string; label: string; isBridge: boolean; feedCount: number };
+type LinkRec = {
+  source: string;
+  target: string;
+  relationship: 'belongs_to' | 'part_of' | 'feeds';
+};
+
+// ── Raw data ──────────────────────────────────────────────────────────────────
+
+const GROUPS: GrpRec[] = [
+  { id: 'grp::marketing_lead_systems',        label: 'Marketing / Lead Systems',        memberCount: 2 },
+  { id: 'grp::files_sftp_email',              label: 'Files (SFTP, Email)',              memberCount: 6 },
+  { id: 'grp::external_source_policy_systems',label: 'External Source Policy Systems',  memberCount: 3 },
+  { id: 'grp::contracting_systems',           label: 'Contracting Systems',             memberCount: 3 },
+  { id: 'grp::financial_systems',             label: 'Financial Systems',               memberCount: 1 },
+  { id: 'grp::sql_server_source',             label: 'SQL Server Source',               memberCount: 2 },
+  { id: 'grp::api_applications',              label: 'API Applications',                memberCount: 2 },
+  { id: 'grp::financial_systems_hr',          label: 'Financial Systems / HR',          memberCount: 2 },
+  { id: 'grp::commission_systems',            label: 'Commission Systems',              memberCount: 2 },
+  { id: 'grp::crm_ams_systems',               label: 'CRM / AMS Systems',              memberCount: 3 },
+  { id: 'grp::calls',                         label: 'Calls',                           memberCount: 2 },
+  { id: 'grp::mastered_entities_mds',         label: 'Mastered Entities (MDS)',         memberCount: 3 },
+];
+
+const SYSTEMS: SysRec[] = [
+  // ── Marketing / Lead Systems ────────────────────────────────────────────────
+  { id: 'sys::HUBSPOT',  label: 'HubSpot Marketing',   type: 'system', systemCode: 'HUBSPOT',  systemGroup: 'Marketing / Lead Systems',       systemType: 'Marketing Automation',     dataZone: 'Enterprise Applications (Internal)' },
+  { id: 'sys::LEADSTAR', label: 'Lead Star',            type: 'system', systemCode: 'LEADSTAR', systemGroup: 'Marketing / Lead Systems',       systemType: 'Lead Management',          dataZone: 'Enterprise Applications (Internal)' },
+  // ── Files (SFTP, Email) ─────────────────────────────────────────────────────
+  { id: 'sys::FILE_COMM',  label: 'Commission Files',          type: 'system', systemCode: 'FILE_COMM',  systemGroup: 'Files (SFTP, Email)', systemType: 'File / SFTP', dataZone: 'Source Data (External)' },
+  { id: 'sys::FILE_CONTR', label: 'Contract Files',            type: 'system', systemCode: 'FILE_CONTR', systemGroup: 'Files (SFTP, Email)', systemType: 'File / SFTP', dataZone: 'Source Data (External)' },
+  { id: 'sys::FILE_PROD',  label: 'Production Files',          type: 'system', systemCode: 'FILE_PROD',  systemGroup: 'Files (SFTP, Email)', systemType: 'File / SFTP', dataZone: 'Source Data (External)' },
+  { id: 'sys::FILE_RTS',   label: 'RTS Certs License Appt',   type: 'system', systemCode: 'FILE_RTS',   systemGroup: 'Files (SFTP, Email)', systemType: 'File / SFTP', dataZone: 'Source Data (External)' },
+  { id: 'sys::FILE_HIER',  label: 'Hierarchy Files',           type: 'system', systemCode: 'FILE_HIER',  systemGroup: 'Files (SFTP, Email)', systemType: 'File / SFTP', dataZone: 'Source Data (External)' },
+  { id: 'sys::FILE_AGENT', label: 'Agent Files',               type: 'system', systemCode: 'FILE_AGENT', systemGroup: 'Files (SFTP, Email)', systemType: 'File / SFTP', dataZone: 'Source Data (External)' },
+  // ── External Source Policy Systems ──────────────────────────────────────────
+  { id: 'sys::SUNFIRE',   label: 'SunFire Policy System',   type: 'system', systemCode: 'SUNFIRE',   systemGroup: 'External Source Policy Systems', systemType: 'External Policy System', dataZone: 'Source Data (External)' },
+  { id: 'sys::AGILITY',   label: 'Agility Policy System',   type: 'system', systemCode: 'AGILITY',   systemGroup: 'External Source Policy Systems', systemType: 'External Policy System', dataZone: 'Source Data (External)' },
+  { id: 'sys::PROFORMEX', label: 'Proformex Policy System', type: 'system', systemCode: 'PROFORMEX', systemGroup: 'External Source Policy Systems', systemType: 'External Policy System', dataZone: 'Source Data (External)' },
+  // ── Contracting Systems ─────────────────────────────────────────────────────
+  { id: 'sys::AGENTSYNC', label: 'AgentSync Contracting',      type: 'system', systemCode: 'AGENTSYNC', systemGroup: 'Contracting Systems', systemType: 'Contracting Platform',      dataZone: 'Enterprise Applications (Internal)' },
+  { id: 'sys::SAT',       label: 'SAT Contracting Platform',   type: 'system', systemCode: 'SAT',       systemGroup: 'Contracting Systems', systemType: 'Contracting Platform (DB)', dataZone: 'Enterprise Applications (Internal)' },
+  { id: 'sys::VUE_CONTR', label: 'VUE Contracting Platform',  type: 'system', systemCode: 'VUE_CONTR', systemGroup: 'Contracting Systems', systemType: 'Contracting Platform (DB)', dataZone: 'Enterprise Applications (Internal)' },
+  // ── Financial Systems ───────────────────────────────────────────────────────
+  { id: 'sys::FDM', label: 'Finance Commission Platform', type: 'system', systemCode: 'FDM', systemGroup: 'Financial Systems', systemType: 'Finance Platform', dataZone: 'Banking / Cash management' },
+  // ── SQL Server Source ───────────────────────────────────────────────────────
+  { id: 'sys::AMLSTATING', label: 'AML Stating Database',       type: 'system', systemCode: 'AMLSTATING', systemGroup: 'SQL Server Source', systemType: 'SQL Server DB', dataZone: 'Source Data (Internal)' },
+  { id: 'sys::EDM_CONSOL', label: 'EDM Consolidation Database', type: 'system', systemCode: 'EDM_CONSOL', systemGroup: 'SQL Server Source', systemType: 'SQL Server DB', dataZone: 'Source Data (Internal)' },
+  // ── API Applications ────────────────────────────────────────────────────────
+  { id: 'sys::COMULATE', label: 'Comulate API',        type: 'system', systemCode: 'COMULATE', systemGroup: 'API Applications', systemType: 'API / Integration', dataZone: 'Source Data (External)' },
+  { id: 'sys::TROVATA',  label: 'Trovata Banking API', type: 'system', systemCode: 'TROVATA',  systemGroup: 'API Applications', systemType: 'API / Integration', dataZone: 'Source Data (External)' },
+  // ── Financial Systems / HR ──────────────────────────────────────────────────
+  { id: 'sys::ORACLE_FUS', label: 'Oracle Fusion ERP',   type: 'system', systemCode: 'ORACLE_FUS', systemGroup: 'Financial Systems / HR', systemType: 'ERP / Finance', dataZone: 'Enterprise Applications (Internal)' },
+  { id: 'sys::ONESTREAM',  label: 'OneStream Financial', type: 'system', systemCode: 'ONESTREAM',  systemGroup: 'Financial Systems / HR', systemType: 'ERP / Finance', dataZone: 'Enterprise Applications (Internal)' },
+  // ── Commission Systems ──────────────────────────────────────────────────────
+  { id: 'sys::VUE_COMM', label: 'VUE Commission Platform', type: 'system', systemCode: 'VUE_COMM', systemGroup: 'Commission Systems', systemType: 'Commission Platform (DB)', dataZone: 'Enterprise Applications (Internal)' },
+  { id: 'sys::VARICENT', label: 'Varicent Commission',     type: 'system', systemCode: 'VARICENT', systemGroup: 'Commission Systems', systemType: 'Commission Platform',      dataZone: 'Enterprise Applications (Internal)' },
+  // ── CRM / AMS Systems ──────────────────────────────────────────────────────
+  { id: 'sys::KIZEN',    label: 'Kizen CRM',              type: 'system', systemCode: 'KIZEN',    systemGroup: 'CRM / AMS Systems', systemType: 'CRM / AMS', dataZone: 'Enterprise Applications (Internal)' },
+  { id: 'sys::LEADPERF', label: 'LeadPerfection CRM',     type: 'system', systemCode: 'LEADPERF', systemGroup: 'CRM / AMS Systems', systemType: 'CRM / AMS', dataZone: 'Enterprise Applications (Internal)' },
+  { id: 'sys::ONEHQ',    label: 'OneHQ Agent Management', type: 'system', systemCode: 'ONEHQ',    systemGroup: 'CRM / AMS Systems', systemType: 'CRM / AMS', dataZone: 'Enterprise Applications (Internal)' },
+  // ── Calls ───────────────────────────────────────────────────────────────────
+  { id: 'sys::AVAYA',       label: 'AVAYA Telephony',    type: 'system', systemCode: 'AVAYA',       systemGroup: 'Calls', systemType: 'Telephony / Call Center', dataZone: 'Enterprise Applications (Internal)' },
+  { id: 'sys::RINGCENTRAL', label: 'RingCentral UCaaS',  type: 'system', systemCode: 'RINGCENTRAL', systemGroup: 'Calls', systemType: 'Telephony / Call Center', dataZone: 'Enterprise Applications (Internal)' },
+  // ── Mastered Entities (MDS) ─────────────────────────────────────────────────
+  { id: 'sys::MDS_WORKDAY', label: 'Workday MDS', type: 'system', systemCode: 'MDS_WORKDAY', systemGroup: 'Mastered Entities (MDS)', systemType: 'Master Data Source', dataZone: 'Enterprise Applications (Internal)' },
+  { id: 'sys::MDS_ORACLE',  label: 'Oracle MDS',  type: 'system', systemCode: 'MDS_ORACLE',  systemGroup: 'Mastered Entities (MDS)', systemType: 'Master Data Source', dataZone: 'Enterprise Applications (Internal)' },
+  { id: 'sys::MDS_OTHER',   label: 'Other MDS',   type: 'system', systemCode: 'MDS_OTHER',   systemGroup: 'Mastered Entities (MDS)', systemType: 'Master Data Source', dataZone: 'Enterprise Applications (Internal)' },
+  // ── Subsystems of FILE_RTS ─────────────────────────────────────────────────
+  { id: 'sys::FILE_RTS_CERTS',        label: 'Certs',        type: 'subsystem', systemCode: 'FILE_RTS_CERTS',        systemGroup: 'FILE_RTS', systemType: 'File', dataZone: 'Bronze' },
+  { id: 'sys::FILE_RTS_LICENSE',      label: 'License',      type: 'subsystem', systemCode: 'FILE_RTS_LICENSE',      systemGroup: 'FILE_RTS', systemType: 'File', dataZone: 'Bronze' },
+  { id: 'sys::FILE_RTS_APPOINTMENTS', label: 'Appointments', type: 'subsystem', systemCode: 'FILE_RTS_APPOINTMENTS', systemGroup: 'FILE_RTS', systemType: 'File', dataZone: 'Bronze' },
+];
+
+const ENTITIES: EntRec[] = [
+  { id: 'ent::marketing',                             label: 'Marketing',                             isBridge: false, feedCount: 1 },
+  { id: 'ent::lead_nurturing',                        label: 'Lead nurturing',                        isBridge: false, feedCount: 1 },
+  { id: 'ent::commission_data',                       label: 'Commission data',                       isBridge: false, feedCount: 1 },
+  { id: 'ent::policy_data',                           label: 'Policy data',                           isBridge: true,  feedCount: 3 },
+  { id: 'ent::agent_licensing_contracting',           label: 'Agent licensing & contracting',         isBridge: false, feedCount: 1 },
+  { id: 'ent::contract_data',                         label: 'Contract data',                         isBridge: true,  feedCount: 3 },
+  { id: 'ent::commission_calculations_and_statements',label: 'Commission calculations and statements', isBridge: false, feedCount: 1 },
+  { id: 'ent::staging_source_data',                   label: 'Staging source data',                   isBridge: false, feedCount: 1 },
+  { id: 'ent::consolidation_source_data',             label: 'Consolidation source data',             isBridge: false, feedCount: 1 },
+  { id: 'ent::production_data',                       label: 'Production data',                       isBridge: false, feedCount: 1 },
+  { id: 'ent::certs',                                 label: 'Certs',                                 isBridge: false, feedCount: 1 },
+  { id: 'ent::license',                               label: 'License',                               isBridge: false, feedCount: 1 },
+  { id: 'ent::appointments',                          label: 'Appointments',                          isBridge: true,  feedCount: 2 },
+  { id: 'ent::hierarchy_data',                        label: 'Hierarchy data',                        isBridge: false, feedCount: 1 },
+  { id: 'ent::agent_data',                            label: 'Agent data',                            isBridge: false, feedCount: 1 },
+  { id: 'ent::commission_data_via_api',               label: 'Commission data via API',               isBridge: false, feedCount: 1 },
+  { id: 'ent::banking_cash_management_via_api',       label: 'Banking / Cash management via API',     isBridge: false, feedCount: 1 },
+  { id: 'ent::gl',                                    label: 'GL',                                    isBridge: false, feedCount: 1 },
+  { id: 'ent::finance',                               label: 'Finance',                               isBridge: false, feedCount: 1 },
+  { id: 'ent::hr',                                    label: 'HR',                                    isBridge: false, feedCount: 1 },
+  { id: 'ent::financial_consolidation_reporting',     label: 'Financial consolidation/reporting',     isBridge: false, feedCount: 1 },
+  { id: 'ent::commission_processing',                 label: 'Commission processing',                 isBridge: false, feedCount: 1 },
+  { id: 'ent::commission_calculations_statements',    label: 'Commission calculations/statements',    isBridge: false, feedCount: 1 },
+  { id: 'ent::agent_contact',                         label: 'Agent Contact',                         isBridge: false, feedCount: 1 },
+  { id: 'ent::campaign',                              label: 'Campaign',                              isBridge: false, feedCount: 1 },
+  { id: 'ent::leads',                                 label: 'Leads',                                 isBridge: true,  feedCount: 2 },
+  { id: 'ent::lead_management',                       label: 'Lead management',                       isBridge: false, feedCount: 1 },
+  { id: 'ent::agent_management',                      label: 'Agent management',                      isBridge: false, feedCount: 1 },
+  { id: 'ent::one_portal',                            label: 'One Portal',                            isBridge: false, feedCount: 1 },
+  { id: 'ent::call_data',                             label: 'Call data',                             isBridge: false, feedCount: 1 },
+  { id: 'ent::call_data_ucaas',                       label: 'Call data / UCaaS',                     isBridge: false, feedCount: 1 },
+  { id: 'ent::employees',                             label: 'Employees',                             isBridge: false, feedCount: 1 },
+  { id: 'ent::marketers',                             label: 'Marketers',                             isBridge: false, feedCount: 1 },
+  { id: 'ent::principals',                            label: 'Principals',                            isBridge: false, feedCount: 1 },
+  { id: 'ent::carriers',                              label: 'Carriers',                              isBridge: false, feedCount: 1 },
+  { id: 'ent::affiliates',                            label: 'Affiliates',                            isBridge: false, feedCount: 1 },
+  { id: 'ent::products',                              label: 'Products',                              isBridge: false, feedCount: 1 },
+  { id: 'ent::agents',                                label: 'Agents',                                isBridge: false, feedCount: 1 },
+  { id: 'ent::customers',                             label: 'Customers',                             isBridge: false, feedCount: 1 },
+  { id: 'ent::jes',                                   label: 'JEs',                                   isBridge: false, feedCount: 1 },
+  { id: 'ent::certifications',                        label: 'Certifications',                        isBridge: false, feedCount: 1 },
+  { id: 'ent::licensing',                             label: 'Licensing',                             isBridge: false, feedCount: 1 },
+];
+
+const LINKS: LinkRec[] = [
+  // belongs_to (31)
+  { source: 'sys::HUBSPOT',     target: 'grp::marketing_lead_systems',         relationship: 'belongs_to' },
+  { source: 'sys::LEADSTAR',    target: 'grp::marketing_lead_systems',         relationship: 'belongs_to' },
+  { source: 'sys::FILE_COMM',   target: 'grp::files_sftp_email',               relationship: 'belongs_to' },
+  { source: 'sys::FILE_CONTR',  target: 'grp::files_sftp_email',               relationship: 'belongs_to' },
+  { source: 'sys::FILE_PROD',   target: 'grp::files_sftp_email',               relationship: 'belongs_to' },
+  { source: 'sys::FILE_RTS',    target: 'grp::files_sftp_email',               relationship: 'belongs_to' },
+  { source: 'sys::FILE_HIER',   target: 'grp::files_sftp_email',               relationship: 'belongs_to' },
+  { source: 'sys::FILE_AGENT',  target: 'grp::files_sftp_email',               relationship: 'belongs_to' },
+  { source: 'sys::SUNFIRE',     target: 'grp::external_source_policy_systems', relationship: 'belongs_to' },
+  { source: 'sys::AGILITY',     target: 'grp::external_source_policy_systems', relationship: 'belongs_to' },
+  { source: 'sys::PROFORMEX',   target: 'grp::external_source_policy_systems', relationship: 'belongs_to' },
+  { source: 'sys::AGENTSYNC',   target: 'grp::contracting_systems',            relationship: 'belongs_to' },
+  { source: 'sys::SAT',         target: 'grp::contracting_systems',            relationship: 'belongs_to' },
+  { source: 'sys::VUE_CONTR',   target: 'grp::contracting_systems',            relationship: 'belongs_to' },
+  { source: 'sys::FDM',         target: 'grp::financial_systems',              relationship: 'belongs_to' },
+  { source: 'sys::AMLSTATING',  target: 'grp::sql_server_source',              relationship: 'belongs_to' },
+  { source: 'sys::EDM_CONSOL',  target: 'grp::sql_server_source',              relationship: 'belongs_to' },
+  { source: 'sys::COMULATE',    target: 'grp::api_applications',               relationship: 'belongs_to' },
+  { source: 'sys::TROVATA',     target: 'grp::api_applications',               relationship: 'belongs_to' },
+  { source: 'sys::ORACLE_FUS',  target: 'grp::financial_systems_hr',           relationship: 'belongs_to' },
+  { source: 'sys::ONESTREAM',   target: 'grp::financial_systems_hr',           relationship: 'belongs_to' },
+  { source: 'sys::VUE_COMM',    target: 'grp::commission_systems',             relationship: 'belongs_to' },
+  { source: 'sys::VARICENT',    target: 'grp::commission_systems',             relationship: 'belongs_to' },
+  { source: 'sys::KIZEN',       target: 'grp::crm_ams_systems',               relationship: 'belongs_to' },
+  { source: 'sys::LEADPERF',    target: 'grp::crm_ams_systems',               relationship: 'belongs_to' },
+  { source: 'sys::ONEHQ',       target: 'grp::crm_ams_systems',               relationship: 'belongs_to' },
+  { source: 'sys::AVAYA',       target: 'grp::calls',                          relationship: 'belongs_to' },
+  { source: 'sys::RINGCENTRAL', target: 'grp::calls',                          relationship: 'belongs_to' },
+  { source: 'sys::MDS_WORKDAY', target: 'grp::mastered_entities_mds',         relationship: 'belongs_to' },
+  { source: 'sys::MDS_ORACLE',  target: 'grp::mastered_entities_mds',         relationship: 'belongs_to' },
+  { source: 'sys::MDS_OTHER',   target: 'grp::mastered_entities_mds',         relationship: 'belongs_to' },
+  // part_of (3)
+  { source: 'sys::FILE_RTS_CERTS',        target: 'sys::FILE_RTS', relationship: 'part_of' },
+  { source: 'sys::FILE_RTS_LICENSE',      target: 'sys::FILE_RTS', relationship: 'part_of' },
+  { source: 'sys::FILE_RTS_APPOINTMENTS', target: 'sys::FILE_RTS', relationship: 'part_of' },
+  // feeds (48)
+  { source: 'sys::HUBSPOT',               target: 'ent::marketing',                              relationship: 'feeds' },
+  { source: 'sys::HUBSPOT',               target: 'ent::lead_nurturing',                         relationship: 'feeds' },
+  { source: 'sys::FILE_COMM',             target: 'ent::commission_data',                        relationship: 'feeds' },
+  { source: 'sys::SUNFIRE',               target: 'ent::policy_data',                            relationship: 'feeds' },
+  { source: 'sys::AGILITY',               target: 'ent::policy_data',                            relationship: 'feeds' },
+  { source: 'sys::AGENTSYNC',             target: 'ent::agent_licensing_contracting',            relationship: 'feeds' },
+  { source: 'sys::FILE_CONTR',            target: 'ent::contract_data',                          relationship: 'feeds' },
+  { source: 'sys::FDM',                   target: 'ent::commission_calculations_and_statements', relationship: 'feeds' },
+  { source: 'sys::AMLSTATING',            target: 'ent::staging_source_data',                    relationship: 'feeds' },
+  { source: 'sys::EDM_CONSOL',            target: 'ent::consolidation_source_data',              relationship: 'feeds' },
+  { source: 'sys::FILE_PROD',             target: 'ent::production_data',                        relationship: 'feeds' },
+  { source: 'sys::FILE_RTS',              target: 'ent::certs',                                  relationship: 'feeds' },
+  { source: 'sys::FILE_RTS',              target: 'ent::license',                                relationship: 'feeds' },
+  { source: 'sys::FILE_RTS',              target: 'ent::appointments',                           relationship: 'feeds' },
+  { source: 'sys::FILE_HIER',             target: 'ent::hierarchy_data',                         relationship: 'feeds' },
+  { source: 'sys::FILE_AGENT',            target: 'ent::agent_data',                             relationship: 'feeds' },
+  { source: 'sys::PROFORMEX',             target: 'ent::policy_data',                            relationship: 'feeds' },
+  { source: 'sys::COMULATE',              target: 'ent::commission_data_via_api',                relationship: 'feeds' },
+  { source: 'sys::TROVATA',               target: 'ent::banking_cash_management_via_api',        relationship: 'feeds' },
+  { source: 'sys::ORACLE_FUS',            target: 'ent::gl',                                     relationship: 'feeds' },
+  { source: 'sys::ORACLE_FUS',            target: 'ent::finance',                                relationship: 'feeds' },
+  { source: 'sys::ORACLE_FUS',            target: 'ent::hr',                                     relationship: 'feeds' },
+  { source: 'sys::ONESTREAM',             target: 'ent::financial_consolidation_reporting',       relationship: 'feeds' },
+  { source: 'sys::VUE_COMM',              target: 'ent::commission_processing',                  relationship: 'feeds' },
+  { source: 'sys::VARICENT',              target: 'ent::commission_calculations_statements',     relationship: 'feeds' },
+  { source: 'sys::SAT',                   target: 'ent::contract_data',                          relationship: 'feeds' },
+  { source: 'sys::VUE_CONTR',             target: 'ent::contract_data',                          relationship: 'feeds' },
+  { source: 'sys::KIZEN',                 target: 'ent::agent_contact',                          relationship: 'feeds' },
+  { source: 'sys::KIZEN',                 target: 'ent::campaign',                               relationship: 'feeds' },
+  { source: 'sys::KIZEN',                 target: 'ent::leads',                                  relationship: 'feeds' },
+  { source: 'sys::LEADPERF',              target: 'ent::lead_management',                        relationship: 'feeds' },
+  { source: 'sys::ONEHQ',                 target: 'ent::agent_management',                       relationship: 'feeds' },
+  { source: 'sys::ONEHQ',                 target: 'ent::one_portal',                             relationship: 'feeds' },
+  { source: 'sys::LEADSTAR',              target: 'ent::leads',                                  relationship: 'feeds' },
+  { source: 'sys::AVAYA',                 target: 'ent::call_data',                              relationship: 'feeds' },
+  { source: 'sys::RINGCENTRAL',           target: 'ent::call_data_ucaas',                        relationship: 'feeds' },
+  { source: 'sys::MDS_WORKDAY',           target: 'ent::employees',                              relationship: 'feeds' },
+  { source: 'sys::MDS_WORKDAY',           target: 'ent::marketers',                              relationship: 'feeds' },
+  { source: 'sys::MDS_WORKDAY',           target: 'ent::principals',                             relationship: 'feeds' },
+  { source: 'sys::MDS_ORACLE',            target: 'ent::carriers',                               relationship: 'feeds' },
+  { source: 'sys::MDS_ORACLE',            target: 'ent::affiliates',                             relationship: 'feeds' },
+  { source: 'sys::MDS_ORACLE',            target: 'ent::products',                               relationship: 'feeds' },
+  { source: 'sys::MDS_OTHER',             target: 'ent::agents',                                 relationship: 'feeds' },
+  { source: 'sys::MDS_OTHER',             target: 'ent::customers',                              relationship: 'feeds' },
+  { source: 'sys::MDS_OTHER',             target: 'ent::jes',                                    relationship: 'feeds' },
+  { source: 'sys::FILE_RTS_CERTS',        target: 'ent::certifications',                         relationship: 'feeds' },
+  { source: 'sys::FILE_RTS_LICENSE',      target: 'ent::licensing',                              relationship: 'feeds' },
+  { source: 'sys::FILE_RTS_APPOINTMENTS', target: 'ent::appointments',                           relationship: 'feeds' },
+];
+
+// ── Mapping helpers ────────────────────────────────────────────────────────────
+
+function sysIcon(s: SysRec): string {
+  if (s.type === 'subsystem') return '📂';
+  const t = s.systemType;
+  if (t.includes('Marketing')) return '📧';
+  if (t.includes('File') || t.includes('SFTP')) return '📁';
+  if (t.includes('Policy')) return '📋';
+  if (t.includes('Contracting')) return '✍️';
+  if (t.includes('Finance') || t.includes('ERP')) return '💰';
+  if (t.includes('SQL')) return '🗄️';
+  if (t.includes('API') || t.includes('Integration')) return '🔌';
+  if (t.includes('Commission')) return '💲';
+  if (t.includes('CRM') || t.includes('AMS')) return '👥';
+  if (t.includes('Telephony') || t.includes('Call')) return '📞';
+  if (t.includes('Master')) return '⭐';
+  if (t.includes('Lead')) return '🎯';
+  return '⚙️';
+}
+
+// ── Orbital layout ─────────────────────────────────────────────────────────────
+
+interface XY { x: number; y: number }
+
+function computeOrbitalPositions(): Record<string, XY> {
+  const pos: Record<string, XY> = {};
+
+  // Build lookup tables from LINKS
+  const groupOf: Record<string, string> = {};
+  const groupMembers: Record<string, string[]> = {};
+  const parentOf: Record<string, string> = {};
+  const entityFeeders: Record<string, string[]> = {};
+
+  LINKS.forEach(l => {
+    if (l.relationship === 'belongs_to') {
+      groupOf[l.source] = l.target;
+      if (!groupMembers[l.target]) groupMembers[l.target] = [];
+      groupMembers[l.target].push(l.source);
+    } else if (l.relationship === 'part_of') {
+      parentOf[l.source] = l.target;
+    } else {
+      if (!entityFeeders[l.target]) entityFeeders[l.target] = [];
+      entityFeeders[l.target].push(l.source);
+    }
+  });
+
+  // 1. Groups — evenly spaced outer ring, radius 1400, starting at top (−π/2)
+  const R_G = 1400;
+  const groupAngle: Record<string, number> = {};
+  GROUPS.forEach((g, i) => {
+    const a = (i / GROUPS.length) * 2 * Math.PI - Math.PI / 2;
+    groupAngle[g.id] = a;
+    pos[g.id] = { x: Math.round(Math.cos(a) * R_G), y: Math.round(Math.sin(a) * R_G) };
+  });
+
+  // 2. Systems — middle ring (R=780), fanned ±fanWidth around parent group's angle
+  const R_S = 780;
+  const sysXY: Record<string, XY> = {};
+
+  SYSTEMS.filter(s => s.type === 'system').forEach(sys => {
+    const gid = groupOf[sys.id];
+    const baseAngle = gid ? (groupAngle[gid] ?? 0) : 0;
+    const sibs = gid ? (groupMembers[gid] ?? [sys.id]) : [sys.id];
+    const idx = sibs.indexOf(sys.id);
+    const n = sibs.length;
+    const fanWidth = Math.min((n - 1) * 0.22, 0.8);
+    const angle = n > 1 ? baseAngle + (idx / (n - 1) - 0.5) * fanWidth : baseAngle;
+    const p: XY = { x: Math.round(Math.cos(angle) * R_S), y: Math.round(Math.sin(angle) * R_S) };
+    pos[sys.id] = p;
+    sysXY[sys.id] = p;
+  });
+
+  // 3. Subsystems — pulled 200px inward from parent system, spread ±0.22 rad
+  SYSTEMS.filter(s => s.type === 'subsystem').forEach(sub => {
+    const pid = parentOf[sub.id];
+    const ppos = pid ? sysXY[pid] : null;
+    if (ppos) {
+      const pAngle = Math.atan2(ppos.y, ppos.x);
+      const pRadius = Math.hypot(ppos.x, ppos.y);
+      const sibSubs = SYSTEMS.filter(s => s.type === 'subsystem' && parentOf[s.id] === pid);
+      const sidx = sibSubs.indexOf(sub);
+      const sn = sibSubs.length;
+      const fan = sn > 1 ? (sidx / (sn - 1) - 0.5) * 0.44 : 0;
+      const r = Math.max(pRadius - 200, 300);
+      const p: XY = { x: Math.round(Math.cos(pAngle + fan) * r), y: Math.round(Math.sin(pAngle + fan) * r) };
+      pos[sub.id] = p;
+      sysXY[sub.id] = p;
+    } else {
+      const fallback: XY = { x: 0, y: -1200 };
+      pos[sub.id] = fallback;
+      sysXY[sub.id] = fallback;
+    }
+  });
+
+  // 4. Entities — pushed ~290px radially outward from feeder centroid
+  ENTITIES.forEach((ent, fi) => {
+    const feeders = entityFeeders[ent.id] ?? [];
+    let cx = 0, cy = 0, count = 0;
+    feeders.forEach(fid => {
+      const fp = sysXY[fid];
+      if (fp) { cx += fp.x; cy += fp.y; count++; }
+    });
+    if (count > 0) {
+      cx /= count; cy /= count;
+      const angle = Math.atan2(cy, cx);
+      const r = Math.hypot(cx, cy) + 290;
+      pos[ent.id] = { x: Math.round(Math.cos(angle) * r), y: Math.round(Math.sin(angle) * r) };
+    } else {
+      pos[ent.id] = { x: (fi % 5 - 2) * 240, y: Math.floor(fi / 5) * 240 };
+    }
+  });
+
+  return pos;
+}
+
+const positions = computeOrbitalPositions();
+
+// ── React Flow node/edge arrays ────────────────────────────────────────────────
+
+const groupNodes: Node<NodeData>[] = GROUPS.map(g => ({
+  id: g.id,
+  type: 'graphNode',
+  position: positions[g.id] ?? { x: 0, y: 0 },
+  data: {
+    label: g.label,
+    subtitle: `${g.memberCount} Systems`,
+    icon: '🗂️',
+    color: 'purple',
+    properties: {
+      'Category': 'System Group',
+      'Member Systems': String(g.memberCount),
+    },
+    relationshipCounts: LINKS
+      .filter(l => l.target === g.id && l.relationship === 'belongs_to')
+      .map(l => ({ label: SYSTEMS.find(s => s.id === l.source)?.label ?? l.source, count: 1 })),
+  },
+}));
+
+const systemNodes: Node<NodeData>[] = SYSTEMS.map(s => {
+  const isSubsystem = s.type === 'subsystem';
+  const fedEntities = LINKS.filter(l => l.source === s.id && l.relationship === 'feeds');
+  const subCount = LINKS.filter(l => l.target === s.id && l.relationship === 'part_of').length;
+
+  const relCounts: { label: string; count: number }[] = [];
+  if (fedEntities.length) relCounts.push({ label: 'Fed Entities', count: fedEntities.length });
+  if (subCount) relCounts.push({ label: 'Sub-Systems', count: subCount });
+
+  return {
+    id: s.id,
+    type: 'graphNode',
+    position: positions[s.id] ?? { x: 0, y: 0 },
+    data: {
+      label: s.label,
+      subtitle: isSubsystem ? 'Sub-System' : s.systemType,
+      icon: sysIcon(s),
+      color: 'teal',
+      properties: {
+        'Code': s.systemCode,
+        'Group': s.systemGroup,
+        'Type': s.systemType,
+        'Data Zone': s.dataZone,
+      },
+      relationshipCounts: relCounts,
+    },
+  };
+});
+
+const entityNodes: Node<NodeData>[] = ENTITIES.map(e => {
+  const feederCount = LINKS.filter(l => l.target === e.id && l.relationship === 'feeds').length;
+  return {
+    id: e.id,
+    type: 'graphNode',
+    position: positions[e.id] ?? { x: 0, y: 0 },
+    data: {
+      label: e.label,
+      subtitle: e.isBridge ? 'Bridge Entity' : 'Data Entity',
+      icon: e.isBridge ? '🔗' : '📊',
+      color: e.isBridge ? 'orange' : 'blue',
+      properties: {
+        'Feed Count': String(e.feedCount),
+        'Bridge': e.isBridge ? 'Yes' : 'No',
+      },
+      relationshipCounts: [
+        { label: 'Source Systems', count: feederCount },
+      ],
+    },
+  };
+});
+
+export const mockNodes: Node<NodeData>[] = [...groupNodes, ...systemNodes, ...entityNodes];
+
+export const mockEdges: Edge[] = LINKS.map((l, i) => ({
+  id: `e${i}-${l.source.replace(/::/g, '-')}-${l.target.replace(/::/g, '-')}`,
+  source: l.source,
+  target: l.target,
+  type: 'graphEdge',
+  data: { label: l.relationship, isParent: false },
+}));
+
+// ── Legacy mini-node exports — emptied (no satellite nodes in new data) ────────
+
+export const miniNodes: Node<NodeData>[] = [];
+export const miniBasePositions: Record<string, { x: number; y: number }> = {};
+export const miniAnimParams: Record<string, MiniAnimParams> = {};

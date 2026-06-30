@@ -1,0 +1,1339 @@
+{
+  "meta": {
+    "name": "AmeriLife Source-System Metadata Graph",
+    "description": "Force-directed graph of AmeriLife source systems built from the system inventory. System Groups are hubs, Source Systems are leaves, and fed Entities act as connectors that bridge clusters when shared across systems.",
+    "format": "node-link (compatible with d3-force, react-force-graph, cytoscape, vis-network)",
+    "legend": {
+      "group": {
+        "role": "hub / cluster center",
+        "color": "#a855f7"
+      },
+      "system": {
+        "role": "source system leaf",
+        "color": "#5eead4"
+      },
+      "subsystem": {
+        "role": "sub-feed of a parent system",
+        "color": "#99f6e4"
+      },
+      "entity": {
+        "role": "fed entity; shared entities bridge clusters",
+        "color": "#f87171"
+      }
+    },
+    "edge_types": [
+      "belongs_to (system -> group)",
+      "part_of (subsystem -> parent system)",
+      "feeds (system -> entity)"
+    ],
+    "counts": {
+      "nodes": 88,
+      "links": 82,
+      "groups": 12,
+      "systems": 34,
+      "entities": 42
+    },
+    "cross_cluster_bridges": [
+      "Appointments",
+      "Contract data",
+      "Leads",
+      "Policy data"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "sys::HUBSPOT",
+      "label": "HubSpot Marketing",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 25,
+      "systemCode": "HUBSPOT",
+      "systemGroup": "Marketing / Lead Systems",
+      "systemType": "Marketing Automation",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::FILE_COMM",
+      "label": "Commission Files",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 3,
+      "systemCode": "FILE_COMM",
+      "systemGroup": "Files (SFTP, Email)",
+      "systemType": "File / SFTP",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::SUNFIRE",
+      "label": "SunFire Policy System",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 9,
+      "systemCode": "SUNFIRE",
+      "systemGroup": "External Source Policy Systems",
+      "systemType": "External Policy System",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::AGILITY",
+      "label": "Agility Policy System",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 10,
+      "systemCode": "AGILITY",
+      "systemGroup": "External Source Policy Systems",
+      "systemType": "External Policy System",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::AGENTSYNC",
+      "label": "AgentSync Contracting",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 21,
+      "systemCode": "AGENTSYNC",
+      "systemGroup": "Contracting Systems",
+      "systemType": "Contracting Platform",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::FILE_CONTR",
+      "label": "Contract Files",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 7,
+      "systemCode": "FILE_CONTR",
+      "systemGroup": "Files (SFTP, Email)",
+      "systemType": "File / SFTP",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::FDM",
+      "label": "Finance Commission Platform",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 33,
+      "systemCode": "FDM",
+      "systemGroup": "Financial Systems",
+      "systemType": "Finance Platform",
+      "dataZone": "Banking / Cash management/Commission Reconciliation via API"
+    },
+    {
+      "id": "sys::AMLSTATING",
+      "label": "AML Stating Database",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 1,
+      "systemCode": "AMLSTATING",
+      "systemGroup": "SQL Server Source",
+      "systemType": "SQL Server DB",
+      "dataZone": "Source Data (Internal)"
+    },
+    {
+      "id": "sys::EDM_CONSOL",
+      "label": "EDM Consolidation Database",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 2,
+      "systemCode": "EDM_CONSOL",
+      "systemGroup": "SQL Server Source",
+      "systemType": "SQL Server DB",
+      "dataZone": "Source Data (Internal)"
+    },
+    {
+      "id": "sys::FILE_PROD",
+      "label": "Production Files",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 4,
+      "systemCode": "FILE_PROD",
+      "systemGroup": "Files (SFTP, Email)",
+      "systemType": "File / SFTP",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::FILE_RTS",
+      "label": "RTS Certs License Appt Files",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 5,
+      "systemCode": "FILE_RTS",
+      "systemGroup": "Files (SFTP, Email)",
+      "systemType": "File / SFTP",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::FILE_HIER",
+      "label": "Hierarchy Files",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 6,
+      "systemCode": "FILE_HIER",
+      "systemGroup": "Files (SFTP, Email)",
+      "systemType": "File / SFTP",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::FILE_AGENT",
+      "label": "Agent Files",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 8,
+      "systemCode": "FILE_AGENT",
+      "systemGroup": "Files (SFTP, Email)",
+      "systemType": "File / SFTP",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::PROFORMEX",
+      "label": "Proformex Policy System",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 11,
+      "systemCode": "PROFORMEX",
+      "systemGroup": "External Source Policy Systems",
+      "systemType": "External Policy System",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::COMULATE",
+      "label": "Comulate API",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 12,
+      "systemCode": "COMULATE",
+      "systemGroup": "API Applications",
+      "systemType": "API / Integration",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::TROVATA",
+      "label": "Trovata Banking API",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 13,
+      "systemCode": "TROVATA",
+      "systemGroup": "API Applications",
+      "systemType": "API / Integration",
+      "dataZone": "Source Data (External)"
+    },
+    {
+      "id": "sys::ORACLE_FUS",
+      "label": "Oracle Fusion ERP",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 14,
+      "systemCode": "ORACLE_FUS",
+      "systemGroup": "Financial Systems / HR",
+      "systemType": "ERP / Finance",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::ONESTREAM",
+      "label": "OneStream Financial",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 15,
+      "systemCode": "ONESTREAM",
+      "systemGroup": "Financial Systems / HR",
+      "systemType": "ERP / Finance",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::VUE_COMM",
+      "label": "VUE Commission Platform",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 17,
+      "systemCode": "VUE_COMM",
+      "systemGroup": "Commission Systems",
+      "systemType": "Commission Platform (DB)",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::VARICENT",
+      "label": "Varicent Commission",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 18,
+      "systemCode": "VARICENT",
+      "systemGroup": "Commission Systems",
+      "systemType": "Commission Platform",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::SAT",
+      "label": "SAT Contracting Platform",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 19,
+      "systemCode": "SAT",
+      "systemGroup": "Contracting Systems",
+      "systemType": "Contracting Platform (DB)",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::VUE_CONTR",
+      "label": "VUE Contracting Platform",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 20,
+      "systemCode": "VUE_CONTR",
+      "systemGroup": "Contracting Systems",
+      "systemType": "Contracting Platform (DB)",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::KIZEN",
+      "label": "Kizen CRM",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 22,
+      "systemCode": "KIZEN",
+      "systemGroup": "CRM / AMS Systems",
+      "systemType": "CRM / AMS",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::LEADPERF",
+      "label": "LeadPerfection CRM",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 23,
+      "systemCode": "LEADPERF",
+      "systemGroup": "CRM / AMS Systems",
+      "systemType": "CRM / AMS",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::ONEHQ",
+      "label": "OneHQ Agent Management",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 24,
+      "systemCode": "ONEHQ",
+      "systemGroup": "CRM / AMS Systems",
+      "systemType": "CRM / AMS",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::LEADSTAR",
+      "label": "Lead Star",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 26,
+      "systemCode": "LEADSTAR",
+      "systemGroup": "Marketing / Lead Systems",
+      "systemType": "Lead Management",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::AVAYA",
+      "label": "AVAYA Telephony",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 27,
+      "systemCode": "AVAYA",
+      "systemGroup": "Calls",
+      "systemType": "Telephony / Call Center",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::RINGCENTRAL",
+      "label": "RingCentral UCaaS",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 28,
+      "systemCode": "RINGCENTRAL",
+      "systemGroup": "Calls",
+      "systemType": "Telephony / Call Center",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::MDS_WORKDAY",
+      "label": "Workday MDS",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 29,
+      "systemCode": "MDS_WORKDAY",
+      "systemGroup": "Mastered Entities (MDS)",
+      "systemType": "Master Data Source",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::MDS_ORACLE",
+      "label": "Oracle MDS",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 30,
+      "systemCode": "MDS_ORACLE",
+      "systemGroup": "Mastered Entities (MDS)",
+      "systemType": "Master Data Source",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::MDS_OTHER",
+      "label": "Other MDS",
+      "type": "system",
+      "color": "#5eead4",
+      "val": 8,
+      "systemId": 31,
+      "systemCode": "MDS_OTHER",
+      "systemGroup": "Mastered Entities (MDS)",
+      "systemType": "Master Data Source",
+      "dataZone": "Enterprise Applications (Internal)"
+    },
+    {
+      "id": "sys::FILE_RTS_CERTS",
+      "label": "Certs",
+      "type": "subsystem",
+      "color": "#99f6e4",
+      "val": 5,
+      "systemId": 34,
+      "systemCode": "FILE_RTS_CERTS",
+      "systemGroup": "FILE_RTS",
+      "systemType": "File",
+      "dataZone": "Bronze"
+    },
+    {
+      "id": "sys::FILE_RTS_LICENSE",
+      "label": "License",
+      "type": "subsystem",
+      "color": "#99f6e4",
+      "val": 5,
+      "systemId": 35,
+      "systemCode": "FILE_RTS_LICENSE",
+      "systemGroup": "FILE_RTS",
+      "systemType": "File",
+      "dataZone": "Bronze"
+    },
+    {
+      "id": "sys::FILE_RTS_APPOINTMENTS",
+      "label": "Appointments",
+      "type": "subsystem",
+      "color": "#99f6e4",
+      "val": 5,
+      "systemId": 36,
+      "systemCode": "FILE_RTS_APPOINTMENTS",
+      "systemGroup": "FILE_RTS",
+      "systemType": "File",
+      "dataZone": "Bronze"
+    },
+    {
+      "id": "grp::marketing_lead_systems",
+      "label": "Marketing / Lead Systems",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 14,
+      "memberCount": 2
+    },
+    {
+      "id": "grp::files_sftp_email",
+      "label": "Files (SFTP, Email)",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 18,
+      "memberCount": 6
+    },
+    {
+      "id": "grp::external_source_policy_systems",
+      "label": "External Source Policy Systems",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 15,
+      "memberCount": 3
+    },
+    {
+      "id": "grp::contracting_systems",
+      "label": "Contracting Systems",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 15,
+      "memberCount": 3
+    },
+    {
+      "id": "grp::financial_systems",
+      "label": "Financial Systems",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 13,
+      "memberCount": 1
+    },
+    {
+      "id": "grp::sql_server_source",
+      "label": "SQL Server Source",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 14,
+      "memberCount": 2
+    },
+    {
+      "id": "grp::api_applications",
+      "label": "API Applications",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 14,
+      "memberCount": 2
+    },
+    {
+      "id": "grp::financial_systems_hr",
+      "label": "Financial Systems / HR",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 14,
+      "memberCount": 2
+    },
+    {
+      "id": "grp::commission_systems",
+      "label": "Commission Systems",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 14,
+      "memberCount": 2
+    },
+    {
+      "id": "grp::crm_ams_systems",
+      "label": "CRM / AMS Systems",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 15,
+      "memberCount": 3
+    },
+    {
+      "id": "grp::calls",
+      "label": "Calls",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 14,
+      "memberCount": 2
+    },
+    {
+      "id": "grp::mastered_entities_mds",
+      "label": "Mastered Entities (MDS)",
+      "type": "group",
+      "color": "#a855f7",
+      "val": 15,
+      "memberCount": 3
+    },
+    {
+      "id": "ent::marketing",
+      "label": "Marketing",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::lead_nurturing",
+      "label": "Lead nurturing",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::commission_data",
+      "label": "Commission data",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::policy_data",
+      "label": "Policy data",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 15,
+      "feedCount": 3,
+      "isBridge": true
+    },
+    {
+      "id": "ent::agent_licensing_contracting",
+      "label": "Agent licensing & contracting",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::contract_data",
+      "label": "Contract data",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 15,
+      "feedCount": 3,
+      "isBridge": true
+    },
+    {
+      "id": "ent::commission_calculations_and_statements",
+      "label": "Commission calculations and statements",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::staging_source_data",
+      "label": "Staging source data",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::consolidation_source_data",
+      "label": "Consolidation source data",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::production_data",
+      "label": "Production data",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::certs",
+      "label": "Certs",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::license",
+      "label": "License",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::appointments",
+      "label": "Appointments",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 11,
+      "feedCount": 2,
+      "isBridge": true
+    },
+    {
+      "id": "ent::hierarchy_data",
+      "label": "Hierarchy data",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::agent_data",
+      "label": "Agent data",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::commission_data_via_api",
+      "label": "Commission data via API",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::banking_cash_management_via_api",
+      "label": "Banking / Cash management via API",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::gl",
+      "label": "GL",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::finance",
+      "label": "Finance",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::hr",
+      "label": "HR",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::financial_consolidation_reporting",
+      "label": "Financial consolidation/reporting",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::commission_processing",
+      "label": "Commission processing",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::commission_calculations_statements",
+      "label": "Commission calculations/statements",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::agent_contact",
+      "label": "Agent Contact",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::campaign",
+      "label": "Campaign",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::leads",
+      "label": "Leads",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 11,
+      "feedCount": 2,
+      "isBridge": true
+    },
+    {
+      "id": "ent::lead_management",
+      "label": "Lead management",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::agent_management",
+      "label": "Agent management",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::one_portal",
+      "label": "One Portal",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::call_data",
+      "label": "Call data",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::call_data_ucaas",
+      "label": "Call data / UCaaS",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::employees",
+      "label": "Employees",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::marketers",
+      "label": "Marketers",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::principals",
+      "label": "Principals",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::carriers",
+      "label": "Carriers",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::affiliates",
+      "label": "Affiliates",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::products",
+      "label": "Products",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::agents",
+      "label": "Agents",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::customers",
+      "label": "Customers",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::jes",
+      "label": "JEs",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::certifications",
+      "label": "Certifications",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    },
+    {
+      "id": "ent::licensing",
+      "label": "Licensing",
+      "type": "entity",
+      "color": "#f87171",
+      "val": 7,
+      "feedCount": 1,
+      "isBridge": false
+    }
+  ],
+  "links": [
+    {
+      "source": "sys::HUBSPOT",
+      "target": "grp::marketing_lead_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::LEADSTAR",
+      "target": "grp::marketing_lead_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::FILE_COMM",
+      "target": "grp::files_sftp_email",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::FILE_CONTR",
+      "target": "grp::files_sftp_email",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::FILE_PROD",
+      "target": "grp::files_sftp_email",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::FILE_RTS",
+      "target": "grp::files_sftp_email",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::FILE_HIER",
+      "target": "grp::files_sftp_email",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::FILE_AGENT",
+      "target": "grp::files_sftp_email",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::SUNFIRE",
+      "target": "grp::external_source_policy_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::AGILITY",
+      "target": "grp::external_source_policy_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::PROFORMEX",
+      "target": "grp::external_source_policy_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::AGENTSYNC",
+      "target": "grp::contracting_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::SAT",
+      "target": "grp::contracting_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::VUE_CONTR",
+      "target": "grp::contracting_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::FDM",
+      "target": "grp::financial_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::AMLSTATING",
+      "target": "grp::sql_server_source",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::EDM_CONSOL",
+      "target": "grp::sql_server_source",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::COMULATE",
+      "target": "grp::api_applications",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::TROVATA",
+      "target": "grp::api_applications",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::ORACLE_FUS",
+      "target": "grp::financial_systems_hr",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::ONESTREAM",
+      "target": "grp::financial_systems_hr",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::VUE_COMM",
+      "target": "grp::commission_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::VARICENT",
+      "target": "grp::commission_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::KIZEN",
+      "target": "grp::crm_ams_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::LEADPERF",
+      "target": "grp::crm_ams_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::ONEHQ",
+      "target": "grp::crm_ams_systems",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::AVAYA",
+      "target": "grp::calls",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::RINGCENTRAL",
+      "target": "grp::calls",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::MDS_WORKDAY",
+      "target": "grp::mastered_entities_mds",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::MDS_ORACLE",
+      "target": "grp::mastered_entities_mds",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::MDS_OTHER",
+      "target": "grp::mastered_entities_mds",
+      "relationship": "belongs_to"
+    },
+    {
+      "source": "sys::FILE_RTS_CERTS",
+      "target": "sys::FILE_RTS",
+      "relationship": "part_of"
+    },
+    {
+      "source": "sys::FILE_RTS_LICENSE",
+      "target": "sys::FILE_RTS",
+      "relationship": "part_of"
+    },
+    {
+      "source": "sys::FILE_RTS_APPOINTMENTS",
+      "target": "sys::FILE_RTS",
+      "relationship": "part_of"
+    },
+    {
+      "source": "sys::HUBSPOT",
+      "target": "ent::marketing",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::HUBSPOT",
+      "target": "ent::lead_nurturing",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_COMM",
+      "target": "ent::commission_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::SUNFIRE",
+      "target": "ent::policy_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::AGILITY",
+      "target": "ent::policy_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::AGENTSYNC",
+      "target": "ent::agent_licensing_contracting",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_CONTR",
+      "target": "ent::contract_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FDM",
+      "target": "ent::commission_calculations_and_statements",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::AMLSTATING",
+      "target": "ent::staging_source_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::EDM_CONSOL",
+      "target": "ent::consolidation_source_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_PROD",
+      "target": "ent::production_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_RTS",
+      "target": "ent::certs",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_RTS",
+      "target": "ent::license",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_RTS",
+      "target": "ent::appointments",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_HIER",
+      "target": "ent::hierarchy_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_AGENT",
+      "target": "ent::agent_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::PROFORMEX",
+      "target": "ent::policy_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::COMULATE",
+      "target": "ent::commission_data_via_api",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::TROVATA",
+      "target": "ent::banking_cash_management_via_api",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::ORACLE_FUS",
+      "target": "ent::gl",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::ORACLE_FUS",
+      "target": "ent::finance",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::ORACLE_FUS",
+      "target": "ent::hr",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::ONESTREAM",
+      "target": "ent::financial_consolidation_reporting",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::VUE_COMM",
+      "target": "ent::commission_processing",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::VARICENT",
+      "target": "ent::commission_calculations_statements",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::SAT",
+      "target": "ent::contract_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::VUE_CONTR",
+      "target": "ent::contract_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::KIZEN",
+      "target": "ent::agent_contact",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::KIZEN",
+      "target": "ent::campaign",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::KIZEN",
+      "target": "ent::leads",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::LEADPERF",
+      "target": "ent::lead_management",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::ONEHQ",
+      "target": "ent::agent_management",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::ONEHQ",
+      "target": "ent::one_portal",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::LEADSTAR",
+      "target": "ent::leads",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::AVAYA",
+      "target": "ent::call_data",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::RINGCENTRAL",
+      "target": "ent::call_data_ucaas",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::MDS_WORKDAY",
+      "target": "ent::employees",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::MDS_WORKDAY",
+      "target": "ent::marketers",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::MDS_WORKDAY",
+      "target": "ent::principals",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::MDS_ORACLE",
+      "target": "ent::carriers",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::MDS_ORACLE",
+      "target": "ent::affiliates",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::MDS_ORACLE",
+      "target": "ent::products",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::MDS_OTHER",
+      "target": "ent::agents",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::MDS_OTHER",
+      "target": "ent::customers",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::MDS_OTHER",
+      "target": "ent::jes",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_RTS_CERTS",
+      "target": "ent::certifications",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_RTS_LICENSE",
+      "target": "ent::licensing",
+      "relationship": "feeds"
+    },
+    {
+      "source": "sys::FILE_RTS_APPOINTMENTS",
+      "target": "ent::appointments",
+      "relationship": "feeds"
+    }
+  ]
+}
