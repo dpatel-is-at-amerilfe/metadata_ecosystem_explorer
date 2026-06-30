@@ -53,7 +53,7 @@ export function InspectorPanel({ node, onClose }: Props) {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className="py-3 mr-5 text-xs font-medium capitalize transition-colors border-b-2"
+            className="py-3 gap-5 mr-5 text-lg font-medium capitalize transition-colors border-b-2"
             style={{
               borderColor: activeTab === tab ? colors.border : 'transparent',
               color: activeTab === tab ? '#e2e8f0' : '#475569',

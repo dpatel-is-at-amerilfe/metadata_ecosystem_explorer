@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { getBezierPath, EdgeLabelRenderer } from '@xyflow/react';
 import type { EdgeProps } from '@xyflow/react';
 
-type GraphEdgeData = { label?: string; isParent?: boolean };
+type GraphEdgeData = { label?: string; isParent?: boolean; curvature?: number };
 type GraphEdgeProps = EdgeProps & { data?: GraphEdgeData };
 
 function GraphEdge({
@@ -24,7 +24,7 @@ function GraphEdge({
     targetX,
     targetY,
     targetPosition,
-    curvature: 0.35,
+    curvature: data?.curvature ?? 0.35,
   });
 
   const isParent = data?.isParent;
